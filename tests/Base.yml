@@ -1,0 +1,34 @@
+Poll:
+	mobile-poll:
+		Title: iPhone, Android, others? 
+		MultiChoice: 0
+	color-poll:
+		Titlle: What is your favorite color?
+		MultiChoice: 1
+
+PollChoice:
+	iphone:
+		Title: iPhone
+		Votes: 120
+		Poll: =>Poll.mobile-poll
+	android:
+		Title: Android
+		Votes: 80
+		Poll: =>Poll.mobile-poll
+	other-mobile:
+		Title: Others
+		Votes: 12
+		Poll: =>Poll.mobile-poll
+	red: 
+		Title: Red
+		Votes: 6
+		Poll: =>Poll.color-poll
+	green: 
+		Title: Green
+		Votes: 15
+		Poll: =>Poll.color-poll
+	blue:
+		Title: Blue
+		Votes: 30
+		Poll: =>Poll.color-poll
+	
