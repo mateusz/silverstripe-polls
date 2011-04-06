@@ -9,6 +9,7 @@ class PollForm extends Form {
 
 		$this->poll = $poll;
 		
+		$data = array();
 		foreach($poll->Choices() as $choice) {
 			$data[$choice->ID] = $choice->Title;
 		}
@@ -48,6 +49,8 @@ class PollForm extends Form {
 	}
 
 	function forTemplate() {
+		if (!$this->poll || !$this->poll->IsActive || !$this->poll->Choices()) return null;
+
 		$customised = $this->poll;
 		$customised->DefaultForm = $this->renderWith('Form');
 		

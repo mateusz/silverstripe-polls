@@ -12,7 +12,9 @@ class Poll extends DataObject {
 		'Title' => 'Varchar(50)',
 		'Description' => 'HTMLText',
 		'IsActive' => 'Boolean(1)',
-		'MultiChoice' => 'Boolean'
+		'MultiChoice' => 'Boolean',
+		'Embargo' => 'SS_Datetime',
+		'Expiry' => 'SS_Datetime'
 	);
 	static $has_one = array(
 		'Image' => 'Image'
@@ -29,7 +31,9 @@ class Poll extends DataObject {
 	
 	static $summary_fields = array(
 		'Title',
-		'IsActive'
+		'IsActive',
+		'Embargo',
+		'Expiry'
 	); 
 	
 	static $default_sort = 'Created DESC';
@@ -48,11 +52,23 @@ class Poll extends DataObject {
 					new TextField('Title', 'Poll title (maximum 50 characters)', null, 50),
 					new OptionsetField('MultiChoice', 'Single answer (radio buttons)/multi-choice answer (tick boxes)', array(0 => 'Single answer', 1 => 'Multi-choice answer')),
 					new OptionsetField('IsActive', 'Poll state', array(1 => 'Active', 0 => 'Inactive')),
+					$embargo = new DatetimeField('Embargo', 'Embargo'),
+					$expiry = new DatetimeField('Expiry', 'Expiry'),
 					new HTMLEditorField('Description', 'Description', 12),
 					$image = new ImageField('Image', 'Poll image')
 				)
 			)
 		);
+
+		$embargo->getDateField()->setConfig('showcalendar', true);
+		$embargo->getTimeField()->setConfig('showdropdown', true);
+		$embargo->getDateField()->setConfig('dateformat', 'dd/MM/YYYY');
+		$embargo->getTimeField()->setConfig('timeformat', 'h:m a');
+
+		$expiry->getDateField()->setConfig('showcalendar', true);
+		$expiry->getTimeField()->setConfig('showdropdown', true);
+		$expiry->getDateField()->setConfig('dateformat', 'dd/MM/YYYY');
+		$expiry->getTimeField()->setConfig('timeformat', 'h:m a');
 		
 		// Add the fields that depend on the poll being already saved and having an ID 
 		if($this->ID != 0) {
@@ -134,6 +150,17 @@ class Poll extends DataObject {
 		}
 	}
 
+	function ShouldBeVisible() {
+		if (!$this->IsActive) return false;
+		
+		if ($this->Embargo && SS_Datetime::now()->Format('U')<$this->obj('Embargo')->Format('U') || 
+			$this->Expiry && SS_Datetime::now()->Format('U')>$this->obj('Expiry')->Format('U')) {
+			return false;
+		}
+		
+		return true;
+	}
+
 	/**
 	 * URL to an chart image that is render by Google Chart API 
 	 * @link http://code.google.com/apis/chart/docs/making_charts.html
@@ -141,26 +168,27 @@ class Poll extends DataObject {
 	 * @return string
 	 */ 
 	function getChart() {
+		$extended = $this->extend('replaceChart');
+		if (isset($extended) && count($extended)) return array_shift($extended);
+
 		$apiURL = 'https://chart.googleapis.com/chart';
 		
 		$choices = $this->Choices('', '"Order" ASC');
-	
-		$extended = $this->extend('getChart');
-		if ($extended) return $extended;
 
 		// Fall back to default
 		$labels = array();
 		$data = array();
-		$i = 0;
+		$count = 0;
 		if ($choices) foreach($choices as $choice) {
-			$labels[] = "t{$choice->Title} ({$choice->Votes}),000000,0,$i,11,1.0,:10:";
+			$labels[] = "t{$choice->Title} ({$choice->Votes}),000000,0,$count,11,1.0,:10:";
 			$data[] = $choice->Votes;
-			$i++;
+			$count++;
 		}
 		$labels = implode('|', $labels); 
 		$data = implode(',', $data);
 		$max = (int)(($this->maxVotes()+1) * 1.5);
-		$height = $i*35;
+		$height = $count*35;
+
 		$href = "https://chart.googleapis.com/chart?".
 				"chs=300x$height".			// Chart size
 				"&cht=bhg".				// Chart type
@@ -176,3 +204,4 @@ class Poll extends DataObject {
 		return new PollForm($controller, $name, $this);
 	}
 }
+
