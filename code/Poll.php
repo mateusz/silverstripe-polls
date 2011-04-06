@@ -24,7 +24,7 @@ class Poll extends DataObject {
 	
 	static $searchable_fields = array(
 		'Title', 
-		'IsActive' => 'PostgresBooleanSearchFilter'
+		'IsActive'
 	);
 	
 	static $summary_fields = array(
@@ -35,7 +35,6 @@ class Poll extends DataObject {
 	static $default_sort = 'Created DESC';
 	
 	function getCMSFields() {
-		
 		if($this->ID != 0) {
 			$totalCount = $this->totalVotes();
 		}
@@ -50,98 +49,46 @@ class Poll extends DataObject {
 					new OptionsetField('MultiChoice', 'Single answer (radio buttons)/multi-choice answer (tick boxes)', array(0 => 'Single answer', 1 => 'Multi-choice answer')),
 					new OptionsetField('IsActive', 'Poll state', array(1 => 'Active', 0 => 'Inactive')),
 					new HTMLEditorField('Description', 'Description', 12),
-					new ReadonlyField('Total', 'Total votes', $totalCount),
 					$image = new ImageField('Image', 'Poll image')
 				)
 			)
 		);
-		$image->setCanUploadNewFile(false);
 		
+		// Add the fields that depend on the poll being already saved and having an ID 
 		if($this->ID != 0) {
+			$fields->addFieldToTab('Root.Data', new ReadonlyField('Total', 'Total votes', $totalCount));
+
+			$pollChoicesTable = new ComplexTableField(
+				$this,
+				'Choices', // relation name
+				'PollChoice', // object class
+				array(
+					'Order' => '#',
+					'Title' => 'Answer option',
+					'Votes' => 'Votes'
+				), // fields to show in table
+				PollChoice::getCMSFields_forPopup(), // form that pops up for edit
+				'"PollID" = ' . $this->ID // a filter to only display item associated with this poll
+				);
+			$pollChoicesTable->setAddTitle( 'a poll choice' );
+			$pollChoicesTable->setParentClass('Poll');
+			$fields->addFieldToTab('Root.Choices', $pollChoicesTable);
+
 			$chartTab = new Tab("Chart", new LiteralField('Chart', sprintf(
-				'<h1>%s</h1><p><img src="%s" title="%s" /></p>', 
+				'<h1>%s</h1><p>%s</p>', 
 				$this->Title, 
-				$this->chartURL(), 
+				$this->getChart(), 
 				$this->Title))
 			);
-			
 			$rootTab->push($chartTab);
-		} 
-		
-		$pollChoicesTable = new ComplexTableField(
-			$this,
-			'Choices', // relation name
-			'PollChoice', // object class
-			array(
-				'Order' => '#',
-				'Title' => 'Answer option',
-				'Votes' => 'Votes'
-			), // fields to show in table
-			PollChoice::getCMSFields_forPopup(), // form that pops up for edit
-			'"PollID" = ' . $this->ID // a filter to only display item associated with this poll
-			);
-		$pollChoicesTable->setAddTitle( 'a poll choice' );
-		$pollChoicesTable->setParentClass('Poll');
-		$fields->addFieldToTab('Root.Data', $pollChoicesTable);
+		}
+		else {
+			$fields->addFieldToTab('Root.Choices', new ReadOnlyField('ChoicesPlaceholder', 'Choices', 'You will be able to add options once you have saved the poll for the first time.'));
+		}
 				
 		$this->extend('updateCMSFields', $fields);
 		
 		return $fields; 
-	}
-	
-	function getFormFields() {
-		$data = array(); 
-
-		foreach($this->Choices() as $choice) {
-			$data[$choice->ID] = $choice->Title;
-		}
-		
-		if($this->MultiChoice) {
-			$choiceField = new CheckboxSetField('PollChoices', 'Please select at least one of the checkboxes', $data);
-		}
-		else {
-			$choiceField = new OptionsetField('PollChoices', 'Please select one option', $data);
-		}
-		
-		$fields =  new FieldSet(
-			new HiddenField('PollID', '', $this->ID),
-			$choiceField
-		);
-		
-		$this->extend('updateFormFields', $fields);
-		
-		return $fields; 
-	}
-	
-	/**
-	 * URL to an chart image that is render by Google Chart API 
-	 * @link http://code.google.com/apis/chart/docs/making_charts.html
-	 *
-	 * @return string
-	 */ 
-	function chartURL($width = null, $height = null) {
-		$apiURL = 'https://chart.googleapis.com/chart';
-		
-		// The sort option helps facilitate writing unit test 
-		$choices = $this->Choices('', 'Title ASC'); 
-		
-		if(!$width) $width = 840;
-		if(!$height) $height = 300; 
-		
-		$formattedLabels = array();
-		if ($choices) foreach($choices as $choice) $formattedLabels[] = $choice->Title.'('.$choice->Votes.')';
-		$labels = implode('|', $formattedLabels); 
-		$data = implode(',', $choices->map('ID', 'Votes'));
-		return sprintf(
-			"%s?cht=%s&chs=%sx%s&chl=%s&chd=t:%s&chf=bg,s,00000000&chco=%s", 
-			$apiURL, 
-			'p3', 
-			$width, 
-			$height, 
-			$labels, 
-			$data,
-			'F9D42D'
-		); 
 	}
 	
 	/**
@@ -154,6 +101,13 @@ class Poll extends DataObject {
 		$res = $query->nextRecord();
 
 		return $res['Total'];
+	}
+
+	function maxVotes() {
+		$query = DB::query('SELECT MAX("Votes") As "Max" FROM "PollChoice" WHERE "PollID" = ' . $this->ID); 
+		$res = $query->nextRecord();
+
+		return $res['Max'];
 	}
 	
 	/**
@@ -178,5 +132,47 @@ class Poll extends DataObject {
 		else {
 			return false;
 		}
+	}
+
+	/**
+	 * URL to an chart image that is render by Google Chart API 
+	 * @link http://code.google.com/apis/chart/docs/making_charts.html
+	 *
+	 * @return string
+	 */ 
+	function getChart() {
+		$apiURL = 'https://chart.googleapis.com/chart';
+		
+		$choices = $this->Choices('', '"Order" ASC');
+	
+		$extended = $this->extend('getChart');
+		if ($extended) return $extended;
+
+		// Fall back to default
+		$labels = array();
+		$data = array();
+		$i = 0;
+		if ($choices) foreach($choices as $choice) {
+			$labels[] = "t{$choice->Title} ({$choice->Votes}),000000,0,$i,11,1.0,:10:";
+			$data[] = $choice->Votes;
+			$i++;
+		}
+		$labels = implode('|', $labels); 
+		$data = implode(',', $data);
+		$max = (int)(($this->maxVotes()+1) * 1.5);
+		$height = $i*35;
+		$href = "https://chart.googleapis.com/chart?".
+				"chs=300x$height".			// Chart size
+				"&cht=bhg".				// Chart type
+				"&chco=4D89F9|C6D9FD".	// Alternating bar colours
+				"&chds=0,$max".			// Chart scale
+				"&chd=t1:$data".		// Data
+				"&chm=$labels";			// Custom labels
+
+		return "<img src='$href'/>";
+	}
+
+	function generatePollForm($controller, $name) {
+		return new PollForm($controller, $name, $this);
 	}
 }

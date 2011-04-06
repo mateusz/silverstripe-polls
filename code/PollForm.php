@@ -1,64 +1,32 @@
 <?php
 class PollForm extends Form {
-		
-	protected $poll = null;
-	
-	function __construct($controller, $name, $pollid, $chartWidth = null, $chartHeight = null) {
-		
-		if(!isset($chartWidth)) $chartWidth = 600;
-		if(!isset($chartHeight)) $chartHeight = 300;
-		
-		$this->poll = DataObject::get_one('Poll', '"ID" = ' . $pollid . ' AND  "IsActive" = 1'); 
-		if(!$this->poll) {
-			user_error("Poll with id \"$pollid\" doesn't exist or not active.", E_USER_ERROR);
-		}
-		
-		if($this->poll->Image()->ID > 0) {
-			$imageTag = sprintf('<img class="poll-image" src="%s" />', $this->poll->Image()->SetWidth(168)->URL); 
-		}
-		else {
-			$imageTag = '';
+	protected $poll;
+
+	function __construct($controller, $name, $poll) {
+		if(!$poll) {
+			user_error("The poll doesn't exist.", E_USER_ERROR);
 		}
 
-		if($this->poll->isVoted()) {
-			$output = sprintf(
-				'<div class="poll-chart"><p class="poll-title">%s</p><p class="poll-description">%s</p><p><img src="%s" /></p></div>', 
-				$this->poll->Title, 
-				$this->poll->Description,
-				$this->poll->chartURL($chartWidth, $chartHeight)
-			);
-			
-			$fields = new FieldSet(new LiteralField('PollGraph', $output)); 
-			$actions = new FieldSet(); 
+		$this->poll = $poll;
+		
+		foreach($poll->Choices() as $choice) {
+			$data[$choice->ID] = $choice->Title;
+		}
+		
+		if($poll->MultiChoice) {
+			$choiceField = new CheckboxSetField('PollChoices', '', $data);
 		}
 		else {
-			$choices = array();
-			foreach($this->poll->Choices() as $choice) {
-				$choices[$choice->ID] = $choice->Title; 
-			}
-		
-			$fields = $this->poll->getFormFields();
-			
-			$output = sprintf(
-				'<p class="poll-title">%s</p><p class="poll-description">%s</p>', 
-				$this->poll->Title, 
-				$this->poll->Description
-			);
-
-			$fields->insertBefore(new LiteralField('Meta', $output), 'PollChoices');
-			
-			if($imageTag) {
-				$this->addExtraClass('has-image');
-				$fields->insertBefore(new LiteralField(
-					'PollImage', 
-					$imageTag
-				), 'PollChoices');
-			}
-			
-			$actions = new FieldSet(
-				new FormAction('submitPoll', 'Submit',null, null, 'button')
-			);
+			$choiceField = new OptionsetField('PollChoices', '', $data);
 		}
+		
+		$fields =  new FieldSet(
+			$choiceField
+		);
+		
+		$actions = new FieldSet(
+			new FormAction('submitPoll', 'Submit', null, null, 'button')
+		);
 
 		$validator = new PollForm_Validator('PollChoices'); 
 
@@ -66,7 +34,6 @@ class PollForm extends Form {
 	}
 	
 	function submitPoll($data, $form) {
-		$pollid = $this->poll->ID;
 		$choiceIDs = is_array($data['PollChoices']) ? $data['PollChoices'] : array($data['PollChoices']);
 		$choicesIDs = implode(',', $choiceIDs);
 		$choices = DataObject::get('PollChoice', sprintf('"ID" IN (%s)', $choicesIDs)); 
@@ -79,6 +46,16 @@ class PollForm extends Form {
 		
 		Director::redirectBack();
 	}
+
+	function forTemplate() {
+		$customised = $this->poll;
+		$customised->DefaultForm = $this->renderWith('Form');
+		
+		return $this->customise($customised)->renderWith(array(
+				$this->class,
+				'Form'
+			));
+	}	
 }
 
 /**
