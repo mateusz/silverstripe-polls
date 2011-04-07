@@ -1,4 +1,4 @@
-<% if ShouldBeVisible %>
+<% if Visible %>
 	<h3>$Title</h3>
 	<% if Image %>
 		$Image.ResizedImage(300,200)

@@ -156,7 +156,7 @@ class Poll extends DataObject {
 	/**
 	 * Check if poll should be visible, taking into account the IsActive and embargo/expiry
 	 */
-	function ShouldBeVisible() {
+	function getVisible() {
 		if (!$this->IsActive) return false;
 		
 		if ($this->Embargo && SS_Datetime::now()->Format('U')<$this->obj('Embargo')->Format('U') || 
