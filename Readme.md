@@ -23,38 +23,39 @@ SilverStripe 2.4.x
 
 ## Usage
 
-### Create a poll 
+### CMS usage
 
 1. Log in the CMS 
-1. Go to the **Poll** section
-1. Create a poll, press **Add**, then add a few poll options
+1. Go to the _Poll_ section
+1. Create a poll, press _Add_, then add a few poll options
+1. The further steps depend on how the PollForm has been implemented
 
-### Create a poll form
+### Embed and configure the PollForm
 
 The PollForm knows how to render itself. To embed the PollForm you can for example surface it on your SiteTree object.
 
-`class Page extends SiteTree {
-	static $has_one = array(
-		'Poll' => 'Poll'
-	);
+	class Page extends SiteTree {
+		static $has_one = array(
+			'Poll' => 'Poll'
+		);
 
-	...
+		...
 
-	function PollForm() {
-		return new PollForm($this, 'PollForm', $this->Poll());	
+		function PollForm() {
+			return new PollForm($this, 'PollForm', $this->Poll());	
+		}
+
+		...
 	}
-
-	...
-}`
 
 It's possible to customise the chart through a decorator.
 
-`class PollDecorator extends DataObjectDecorator {
-	function replaceChart() {
-		return "<img src='my_poll_image.png?values=10,20,10'/>";
+	class PollDecorator extends DataObjectDecorator {
+		function replaceChart() {
+			return "<img src='my_poll_image.png?values=10,20,10'/>";
+		}
 	}
-}
 
-Object::add_extension('Poll', 'PollDecorator');`
+	Object::add_extension('Poll', 'PollDecorator');
 
 You can also easily modify the template used for PollForm rendering by creating your own **PollForm.ss**.
