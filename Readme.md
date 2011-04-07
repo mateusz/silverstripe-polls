@@ -1,7 +1,9 @@
 # Polls module
 
 ## Maintainer 
+
 [Saophalkun Ponlu](mailto:phalkunz@silverstripe.com)
+
 [Mateusz Uzdowski](mailto:mateusz@silverstripe.com)
 
 ## Requirements 
@@ -31,8 +33,7 @@ SilverStripe 2.4.x
 
 The PollForm knows how to render itself. To embed the PollForm you can for example surface it on your SiteTree object.
 
-`
-class Page extends SiteTree {
+`class Page extends SiteTree {
 	static $has_one = array(
 		'Poll' => 'Poll'
 	);
@@ -44,20 +45,16 @@ class Page extends SiteTree {
 	}
 
 	...
-}
-`
+}`
 
 It's possible to customise the chart through a decorator.
 
-`
-class PollDecorator extends DataObjectDecorator {
+`class PollDecorator extends DataObjectDecorator {
 	function replaceChart() {
 		return "<img src='my_poll_image.png?values=10,20,10'/>";
 	}
 }
 
-Object::add_extension('Poll', 'PollDecorator');
-`
+Object::add_extension('Poll', 'PollDecorator');`
 
 You can also easily modify the template used for PollForm rendering by creating your own **PollForm.ss**.
-
