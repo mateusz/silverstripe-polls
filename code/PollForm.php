@@ -49,7 +49,7 @@ class PollForm extends Form {
 	}
 
 	function forTemplate() {
-		if (!$this->poll || !$this->poll->IsActive || !$this->poll->Choices()) return null;
+		if (!$this->poll || !$this->poll->ShouldBeVisible() || !$this->poll->Choices()) return null;
 
 		$customised = $this->poll;
 		$customised->DefaultForm = $this->renderWith('Form');

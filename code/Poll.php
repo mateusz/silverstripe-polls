@@ -119,6 +119,9 @@ class Poll extends DataObject {
 		return $res['Total'];
 	}
 
+	/**
+	 * Find out what is the maximum amount of votes received for one of the options.
+	 */
 	function maxVotes() {
 		$query = DB::query('SELECT MAX("Votes") As "Max" FROM "PollChoice" WHERE "PollID" = ' . $this->ID); 
 		$res = $query->nextRecord();
@@ -150,6 +153,9 @@ class Poll extends DataObject {
 		}
 	}
 
+	/**
+	 * Check if poll should be visible, taking into account the IsActive and embargo/expiry
+	 */
 	function ShouldBeVisible() {
 		if (!$this->IsActive) return false;
 		
@@ -198,10 +204,6 @@ class Poll extends DataObject {
 				"&chm=$labels";			// Custom labels
 
 		return "<img src='$href'/>";
-	}
-
-	function generatePollForm($controller, $name) {
-		return new PollForm($controller, $name, $this);
 	}
 }
 
