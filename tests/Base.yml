@@ -1,9 +1,9 @@
 Poll:
 	mobile-poll:
-		Title: iPhone, Android, others? 
+		Title: Which mobile oprating system do you prefer? 
 		MultiChoice: 0
 	color-poll:
-		Titlle: What is your favorite color?
+		Title: What is your favourite color?
 		MultiChoice: 1
 
 PollChoice:
@@ -16,7 +16,7 @@ PollChoice:
 		Votes: 80
 		Poll: =>Poll.mobile-poll
 	other-mobile:
-		Title: Others
+		Title: Other
 		Votes: 12
 		Poll: =>Poll.mobile-poll
 	red: 

@@ -13,9 +13,9 @@ class PollTest extends SapphireTest {
 	
 	function testChartURL() {
 		$mobilePoll = $this->ObjFromFixture('Poll', 'mobile-poll');
-		$this->assertEquals(
-			"https://chart.googleapis.com/chart?cht=p3&chs=300x200&chl=Android(80)|iPhone(120)|Others(12)&chd=t:80,120,12&chf=bg,s,00000000&chco=F9D42D",
-			$mobilePoll->chartURL('300', '200')
-		);
+		$chart = $mobilePoll->getChart();
+		$this->assertContains(urlencode('iPhone (120)'), $chart);
+		$this->assertContains(urlencode('Android (80)'), $chart);
+		$this->assertContains(urlencode('Other (12)'), $chart);
 	}
 }

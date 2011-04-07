@@ -10,7 +10,7 @@
 	<p>This is a test template for just displaying a poll form</p>
 	
 	<div class="right">
-		$Form
+		$PollForm
 	</div>
 	
 </body>
