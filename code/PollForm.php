@@ -71,14 +71,14 @@ class PollForm extends Form {
 	 * Set the default chart options
 	 */
 	function setChartOption($option, $value) {
-		$this->chartOptions['$option'] = $value;
+		$this->chartOptions[$option] = $value;
 	}
 	
 	/**
 	 * Access the default chart options
 	 */
 	function getChartOption($option) {
-		if (isset($this->chartOptions['$option'])) return $this->chartOptions['$option'];
+		if (isset($this->chartOptions[$option])) return $this->chartOptions[$option];
 	}
 
 	/**
