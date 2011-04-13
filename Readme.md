@@ -54,12 +54,20 @@ To embed the PollForm you can create it through your SiteTree object.
 		...
 	}
 
-To customise the chart even more, you can subclass the PollForm. 
-If you want to make a site-wide changes, you can use a decorator as well.
+To customise the chart even more, you can subclass the PollForm and redefine the **getChart** method.
+If you want to make a site-wide changes, you can use a decorator as well. For example the following
+will give you a text-only rendering of results.
 
 	class PollFormDecorator extends DataObjectDecorator {
 		function replaceChart() {
-			return "<img src='my_poll_image.png?values=10,20,10'/>";
+			$choices = $this->owner->Poll()->Choices('', '"Order" ASC');
+
+			$results = array();
+			if ($choices) foreach($choices as $choice) {
+				$results[] = "{$choice->Title}: {$choice->Votes}";
+			}
+
+			return implode($results, '<br/>');
 		}
 	}
 
