@@ -1,9 +1,9 @@
 <% if Poll.Visible %>
 	<h3>$Poll.Title</h3>
-	<% if Image %>
+	<% if Poll.Image %>
 		$Poll.Image.ResizedImage(300,200)
 	<% end_if %>
-	<% if Description %>
+	<% if Poll.Description %>
 		$Poll.Description
 	<% end_if %>
 
