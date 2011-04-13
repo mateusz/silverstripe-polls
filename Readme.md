@@ -32,7 +32,8 @@ SilverStripe 2.4.x
 
 ### Embed and configure the PollForm
 
-The PollForm knows how to render itself. To embed the PollForm you can for example surface it on your SiteTree object.
+The PollForm knows how to render itself, and is able to render both the selection form and the chart, depending on the value detected in the cookie. 
+To embed the PollForm you can create it through your SiteTree object.
 
 	class Page extends SiteTree {
 		static $has_one = array(
@@ -42,20 +43,42 @@ The PollForm knows how to render itself. To embed the PollForm you can for examp
 		...
 
 		function PollForm() {
-			return new PollForm($this, 'PollForm', $this->Poll());	
+			$pollForm = new PollForm($this, 'PollForm', $this->Poll());	
+			// Customise some options
+			$pollForm->setChartOption('height', 300);
+			$pollForm->setChartOption('width', 300);
+			$pollForm->setChartOption('colours', array('FF0000', '00FF00'));
+			return $pollForm;
 		}
 
 		...
 	}
 
-It's possible to customise the chart through a decorator.
+To customise the chart even more, you can subclass the PollForm. 
+If you want to make a site-wide changes, you can use a decorator as well.
 
-	class PollDecorator extends DataObjectDecorator {
+	class PollFormDecorator extends DataObjectDecorator {
 		function replaceChart() {
 			return "<img src='my_poll_image.png?values=10,20,10'/>";
 		}
 	}
 
-	Object::add_extension('Poll', 'PollDecorator');
+	Object::add_extension('PollForm', 'PollFormDecorator');
 
-You can also easily modify the template used for PollForm rendering by creating your own **PollForm.ss**.
+Then, if you need to modify the form and chart template, have a look at **PollForm.ss**. Here is the default setup.
+
+	<% if Poll.Visible %>
+		<h3>$Poll.Title</h3>
+		<% if Image %>
+			$Poll.Image.ResizedImage(300,200)
+		<% end_if %>
+		<% if Description %>
+			$Poll.Description
+		<% end_if %>
+
+		<% if Poll.isVoted %>
+			$Chart
+		<% else %>
+			$DefaultForm
+		<% end_if %>
+	<% end_if %>

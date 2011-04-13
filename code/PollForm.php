@@ -2,6 +2,12 @@
 class PollForm extends Form {
 	protected $poll;
 
+	protected $chartOptions = array(
+		'width'=>'300', 
+		'height'=>'200', 
+		'colours'=>array('4D89F9', 'C6D9FD')
+	);
+
 	function __construct($controller, $name, $poll) {
 		if(!$poll) {
 			user_error("The poll doesn't exist.", E_USER_ERROR);
@@ -48,17 +54,83 @@ class PollForm extends Form {
 		Director::redirectBack();
 	}
 
+	/**
+	 * Renders the poll using the PollForm.ss
+	 */
 	function forTemplate() {
 		if (!$this->poll || !$this->poll->getVisible() || !$this->poll->Choices()) return null;
 
-		$customised = $this->poll;
-		$customised->DefaultForm = $this->renderWith('Form');
-		
-		return $this->customise($customised)->renderWith(array(
+		$this->DefaultForm = $this->renderWith('Form');
+		return $this->customise($this)->renderWith(array(
 				$this->class,
 				'Form'
 			));
-	}	
+	}
+
+	/**
+	 * Set the default chart options
+	 */
+	function setChartOption($option, $value) {
+		$this->chartOptions['$option'] = $value;
+	}
+	
+	/**
+	 * Access the default chart options
+	 */
+	function getChartOption($option) {
+		if (isset($this->chartOptions['$option'])) return $this->chartOptions['$option'];
+	}
+
+	/**
+	 * Access the Poll object associated with this form
+	 */
+	function Poll() {
+		return $this->poll;
+	}
+
+	/**
+	 * URL to an chart image that is render by Google Chart API 
+	 * @link http://code.google.com/apis/chart/docs/making_charts.html
+	 *
+	 * @return string
+	 */ 
+	function getChart() {
+		$extended = $this->extend('replaceChart');
+		if (isset($extended) && count($extended)) return array_shift($extended);
+
+		if (!$this->poll || !$this->poll->getVisible() || !$this->poll->Choices()) return null;
+
+		$apiURL = 'https://chart.googleapis.com/chart';
+		
+		$choices = $this->poll->Choices('', '"Order" ASC');
+
+		// Fall back to default
+		$labels = array();
+		$data = array();
+		$count = 0;
+		if ($choices) foreach($choices as $choice) {
+			$labels[] = "t{$choice->Title} ({$choice->Votes}),000000,0,$count,11,1.0,:10:";
+			$data[] = $choice->Votes;
+			$count++;
+		}
+		$labels = implode('|', $labels); 
+		$data = implode(',', $data);
+		$max = (int)(($this->poll->maxVotes()+1) * 1.5);
+		$height = $this->chartOptions['height'];
+		$width = $this->chartOptions['width'];
+		$colours = implode($this->chartOptions['colours'], '|');
+
+		$href = "https://chart.googleapis.com/chart?".
+				"chs={$width}x$height".	// Chart size
+				"&chbh=a".				// Bar width and spacing
+				"&cht=bhg".				// Chart type
+				"&chco=$colours".		// Alternating bar colours
+				"&chds=0,$max".			// Chart scale
+				"&chd=t1:$data".		// Data
+				"&chm=$labels";			// Custom labels
+
+		return "<img src='$href'/>";
+	}
 }
 
 /**

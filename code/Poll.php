@@ -90,10 +90,12 @@ class Poll extends DataObject {
 			$pollChoicesTable->setParentClass('Poll');
 			$fields->addFieldToTab('Root.Choices', $pollChoicesTable);
 
+			// Display the results using the default poll chart
+			$pollForm = new PollForm(new Controller(), 'PollForm', $this);
 			$chartTab = new Tab("Chart", new LiteralField('Chart', sprintf(
 				'<h1>%s</h1><p>%s</p>', 
 				$this->Title, 
-				$this->getChart(), 
+				$pollForm->getChart(), 
 				$this->Title))
 			);
 			$rootTab->push($chartTab);
@@ -165,45 +167,6 @@ class Poll extends DataObject {
 		}
 		
 		return true;
-	}
-
-	/**
-	 * URL to an chart image that is render by Google Chart API 
-	 * @link http://code.google.com/apis/chart/docs/making_charts.html
-	 *
-	 * @return string
-	 */ 
-	function getChart() {
-		$extended = $this->extend('replaceChart');
-		if (isset($extended) && count($extended)) return array_shift($extended);
-
-		$apiURL = 'https://chart.googleapis.com/chart';
-		
-		$choices = $this->Choices('', '"Order" ASC');
-
-		// Fall back to default
-		$labels = array();
-		$data = array();
-		$count = 0;
-		if ($choices) foreach($choices as $choice) {
-			$labels[] = "t{$choice->Title} ({$choice->Votes}),000000,0,$count,11,1.0,:10:";
-			$data[] = $choice->Votes;
-			$count++;
-		}
-		$labels = implode('|', $labels); 
-		$data = implode(',', $data);
-		$max = (int)(($this->maxVotes()+1) * 1.5);
-		$height = $count*35;
-
-		$href = "https://chart.googleapis.com/chart?".
-				"chs=300x$height".			// Chart size
-				"&cht=bhg".				// Chart type
-				"&chco=4D89F9|C6D9FD".	// Alternating bar colours
-				"&chds=0,$max".			// Chart scale
-				"&chd=t1:$data".		// Data
-				"&chm=$labels";			// Custom labels
-
-		return "<img src='$href'/>";
 	}
 }
 

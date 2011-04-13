@@ -25,7 +25,8 @@ class PollFormTest extends FunctionalTest {
 	function testDisplayChart() {
 		$poll = DataObject::get_one('Poll');
 		$response = $this->get('TestPollForm_Controller', '', '', array('SSPoll_' . $poll->ID => true));
-		$this->assertContains($poll->getChart(), $this->content());
+		$pollForm = new PollForm(new Controller(), 'PollForm', $poll);
+		$this->assertContains($pollForm->getChart(), $this->content());
 	}
 }
 

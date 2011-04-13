@@ -1,13 +1,13 @@
-<% if Visible %>
-	<h3>$Title</h3>
+<% if Poll.Visible %>
+	<h3>$Poll.Title</h3>
 	<% if Image %>
-		$Image.ResizedImage(300,200)
+		$Poll.Image.ResizedImage(300,200)
 	<% end_if %>
 	<% if Description %>
-		$Description
+		$Poll.Description
 	<% end_if %>
 
-	<% if isVoted %>
+	<% if Poll.isVoted %>
 		$Chart
 	<% else %>
 		$DefaultForm
