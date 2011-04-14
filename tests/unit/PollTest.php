@@ -15,9 +15,9 @@ class PollTest extends SapphireTest {
 		$mobilePoll = $this->ObjFromFixture('Poll', 'mobile-poll');
 		$pollForm = new PollForm(new Controller(), 'PollForm', $mobilePoll);
 		$chart = $pollForm->getChart();
-		$this->assertContains('iPhone (120)', $chart);
-		$this->assertContains('Android (80)', $chart);
-		$this->assertContains('Other (12)', $chart);
+		$this->assertContains(urlencode('iPhone (120)'), $chart);
+		$this->assertContains(urlencode('Android (80)'), $chart);
+		$this->assertContains(urlencode('Other (12)'), $chart);
 	}
 
 	function testMaxVotes() {

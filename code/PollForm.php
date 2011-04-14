@@ -97,13 +97,25 @@ class PollForm extends Form {
 		return $this->poll;
 	}
 	
+	/**
+	 * Check if user bypassed the voting form and requested to see the results.
+	 */
 	function isForcedDisplay() {
 		return isset($_REQUEST['poll_results']); 
 	}
 	
-	
+	/**
+	 * Collate the information from PollForm and Poll to figure out if the results should be shown.
+	 */
 	function shouldShowResults() {
 		return $this->poll->isVoted() || $this->isForcedDisplay(); 
+	}
+
+	/**
+	 * Get current configuration so it can be used in the template
+	 */
+	function getShowResultsLink() {
+		return $this->show_results_link;
 	}
 
 	/**
