@@ -1,5 +1,8 @@
 <?php
 class PollForm extends Form {
+	
+	static $show_results_link = false; 
+	
 	protected $poll;
 
 	protected $chartOptions = array(
@@ -30,6 +33,12 @@ class PollForm extends Form {
 		$fields =  new FieldSet(
 			$choiceField
 		);
+		
+		if(PollForm::$show_results_link) {
+			$showResultsURL = Director::get_current_page()->Link() . '?poll_results'; 
+			$showResultsLink = new LiteralField('ShowPollLink', '<a class="show-results" href="' . $showResultsURL . '">Show results</a>'); 
+			$fields->push($showResultsLink); 
+		}
 		
 		$actions = new FieldSet(
 			new FormAction('submitPoll', 'Submit', null, null, 'button')
@@ -87,6 +96,15 @@ class PollForm extends Form {
 	function Poll() {
 		return $this->poll;
 	}
+	
+	function isForcedDisplay() {
+		return isset($_REQUEST['poll_results']); 
+	}
+	
+	
+	function shouldShowResults() {
+		return $this->poll->isVoted() || $this->isForcedDisplay(); 
+	}
 
 	/**
 	 * URL to an chart image that is render by Google Chart API 
@@ -129,7 +147,7 @@ class PollForm extends Form {
 				"&chd=t1:$data".		// Data
 				"&chm=$labels";			// Custom labels
 
-		return "<img src='$href'/>";
+		return "<img class='poll-chart' src='$href'/>";
 	}
 }
 
