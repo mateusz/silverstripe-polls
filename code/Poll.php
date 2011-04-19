@@ -48,7 +48,7 @@ class Poll extends DataObject {
 		
 		$fields = new FieldSet(
 			$rootTab = new TabSet("Root",
-				new Tab("Data",
+				new Tab("Main",
 					new TextField('Title', 'Poll title (maximum 50 characters)', null, 50),
 					new OptionsetField('MultiChoice', 'Single answer (radio buttons)/multi-choice answer (tick boxes)', array(0 => 'Single answer', 1 => 'Multi-choice answer')),
 					new OptionsetField('IsActive', 'Poll state', array(1 => 'Active', 0 => 'Inactive')),
@@ -72,8 +72,6 @@ class Poll extends DataObject {
 		
 		// Add the fields that depend on the poll being already saved and having an ID 
 		if($this->ID != 0) {
-			$fields->addFieldToTab('Root.Data', new ReadonlyField('Total', 'Total votes', $totalCount));
-
 			$pollChoicesTable = new ComplexTableField(
 				$this,
 				'Choices', // relation name
@@ -88,11 +86,14 @@ class Poll extends DataObject {
 				);
 			$pollChoicesTable->setAddTitle( 'a poll choice' );
 			$pollChoicesTable->setParentClass('Poll');
-			$fields->addFieldToTab('Root.Choices', $pollChoicesTable);
+			$pollChoicesTable->setPermissions(array("add", "edit", "show", "delete", "export"));
+			$fields->addFieldToTab('Root.Data', $pollChoicesTable);
+
+			$fields->addFieldToTab('Root.Data', new ReadonlyField('Total', 'Total votes', $totalCount));
 
 			// Display the results using the default poll chart
 			$pollForm = new PollForm(new Controller(), 'PollForm', $this);
-			$chartTab = new Tab("Chart", new LiteralField('Chart', sprintf(
+			$chartTab = new Tab("Result chart", new LiteralField('Chart', sprintf(
 				'<h1>%s</h1><p>%s</p>', 
 				$this->Title, 
 				$pollForm->getChart(), 

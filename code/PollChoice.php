@@ -19,6 +19,12 @@ class PollChoice extends DataObject {
 	static $searchable_fields = array(
 		'Title'
 	);
+
+	static $summary_fields = array(
+		'Order',
+		'Title',
+		'Votes'
+	); 
 	
 	static $default_sort = '"Order" ASC, "Created" ASC';
 	
