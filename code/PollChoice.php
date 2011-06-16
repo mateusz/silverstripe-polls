@@ -64,4 +64,16 @@ class PollChoice extends DataObject {
 			$poll->markAsVoted();
 		}
 	}
+	
+	public function canCreate($member = null) {
+		return Permission::check('MANAGE_POLLS', 'any', $member);
+	}
+	
+	public function canEdit($member = null) {
+		return Permission::check('MANAGE_POLLS', 'any', $member);
+	}
+	
+	public function canDelete($member = null) {
+		return Permission::check('MANAGE_POLLS', 'any', $member);
+	}
 }
