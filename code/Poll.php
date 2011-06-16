@@ -4,7 +4,7 @@
  * 
  * @package polls
  */
-class Poll extends DataObject {
+class Poll extends DataObject implements PermissionProvider {
 	
 	const COOKIE_PREFIX = 'SSPoll_';
 	
@@ -169,5 +169,22 @@ class Poll extends DataObject {
 		
 		return true;
 	}
+	
+	function providePermissions(){
+        return array(
+            "MANAGE_POLLS" => "Manage Polls",
+        );
+    }
+    
+	public function canCreate($member = null) {
+		return Permission::check('MANAGE_POLLS', 'any', $member);
+	}
+	
+	public function canEdit($member = null) {
+		return Permission::check('MANAGE_POLLS', 'any', $member);
+	}
+	
+	public function canDelete($member = null) {
+		return Permission::check('MANAGE_POLLS', 'any', $member);
+	}
 }
-
