@@ -109,27 +109,37 @@ class Poll extends DataObject implements PermissionProvider {
 		
 		return $fields; 
 	}
-	
+
 	/**
 	 * Returns the number of total votes, the sum of all votes from {@link PollChoice}s' votes
+	 * TODO: rewrite as Aggregate, so it uses in-built cache?
 	 * 
 	 * @return int
 	 */ 
-	function totalVotes() {
-		$query = DB::query('SELECT SUM("Votes") As "Total" FROM "PollChoice" WHERE "PollID" = ' . $this->ID); 
-		$res = $query->nextRecord();
+	function totalVotes($useCache = true) {
+		static $_cache;
+		if (!isset($_cache) || !$useCache) {
+			$query = DB::query('SELECT SUM("Votes") As "Total" FROM "PollChoice" WHERE "PollID" = ' . $this->ID); 
+			$res = $query->nextRecord();
+			$_cache = $res['Total'];
+		}
 
-		return $res['Total'];
+		return $_cache;
 	}
 
 	/**
 	 * Find out what is the maximum amount of votes received for one of the options.
+	 * TODO: rewrite as Aggregate, so it uses in-built cache?
 	 */
-	function maxVotes() {
-		$query = DB::query('SELECT MAX("Votes") As "Max" FROM "PollChoice" WHERE "PollID" = ' . $this->ID); 
-		$res = $query->nextRecord();
+	function maxVotes($useCache = true) {
+		static $_cache;
+		if (!isset($_cache) || !$useCache) {
+			$query = DB::query('SELECT MAX("Votes") As "Max" FROM "PollChoice" WHERE "PollID" = ' . $this->ID); 
+			$res = $query->nextRecord();
+			$_cache = $res['Max'];
+		}
 
-		return $res['Max'];
+		return $_cache;
 	}
 	
 	/**

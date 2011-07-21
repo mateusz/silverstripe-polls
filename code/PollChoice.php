@@ -76,4 +76,17 @@ class PollChoice extends DataObject {
 	public function canDelete($member = null) {
 		return Permission::check('MANAGE_POLLS', 'any', $member);
 	}
+
+	/**
+	 * Return the relative fractional size in comparison with the maximum (winning) result.
+	 * Useful for plotting.
+	 *
+	 * @param $formatPercent If true, return 55%, if not, return 0.55
+	 */
+	function getPercentage() {
+		$max = $this->Poll()->maxVotes();
+		if ($max==0) $max = 1;
+		$ratio = $this->Votes/$this->Poll()->maxVotes();
+		return ((int)($ratio*100)).'%';
+	}
 }
