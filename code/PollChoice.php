@@ -84,9 +84,9 @@ class PollChoice extends DataObject {
 	 * @param $formatPercent If true, return 55%, if not, return 0.55
 	 */
 	function getPercentage() {
-		$max = $this->Poll()->maxVotes();
+		$max = $this->Poll()->getMaxVotes();
 		if ($max==0) $max = 1;
-		$ratio = $this->Votes/$this->Poll()->maxVotes();
+		$ratio = $this->Votes/$this->Poll()->getMaxVotes();
 		return ((int)($ratio*100)).'%';
 	}
 }

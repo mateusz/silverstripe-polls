@@ -10,7 +10,7 @@
 		$Poll.Description
 	<% end_if %>
 
-	<% if shouldShowResults %>
+	<% if ShouldShowResults %>
 		$Chart
 	<% else %>
 		$DefaultForm

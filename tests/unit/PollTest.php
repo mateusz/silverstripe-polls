@@ -5,10 +5,10 @@ class PollTest extends SapphireTest {
 	
 	function testTotalVotes() {
 		$mobilePoll = $this->ObjFromFixture('Poll', 'mobile-poll');
-		$this->assertEquals(120 + 80 + 12, $mobilePoll->totalVotes());
+		$this->assertEquals(120 + 80 + 12, $mobilePoll->getTotalVotes());
 		
 		$mobilePoll = $this->ObjFromFixture('Poll', 'color-poll');
-		$this->assertEquals(6 + 15 + 30, $mobilePoll->totalVotes());
+		$this->assertEquals(6 + 15 + 30, $mobilePoll->getTotalVotes());
 	}
 	
 	function testChartURL() {
@@ -22,7 +22,7 @@ class PollTest extends SapphireTest {
 
 	function testMaxVotes() {
 		$mobilePoll = $this->ObjFromFixture('Poll', 'mobile-poll');
-		$this->assertEquals(120, $mobilePoll->maxVotes());	
+		$this->assertEquals(120, $mobilePoll->getMaxVotes());	
 	}
 
 	function testVisible() {

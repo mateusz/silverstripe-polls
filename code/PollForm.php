@@ -107,7 +107,7 @@ class PollForm extends Form {
 	/**
 	 * Collate the information from PollForm and Poll to figure out if the results should be shown.
 	 */
-	function shouldShowResults() {
+	function getShouldShowResults() {
 		return $this->poll->isVoted() || $this->isForcedDisplay(); 
 	}
 
@@ -121,6 +121,10 @@ class PollForm extends Form {
 	/**
 	 * URL to an chart image that is render by Google Chart API 
 	 * @link http://code.google.com/apis/chart/docs/making_charts.html
+	 * This is quite rudimentary, and can be modified by combination of methods:
+	 * - defining a PollForm decorator and replaceChart method
+	 * - creating a custom PollForm.ss template in your theme folder
+	 * - subclassing this form for full control
 	 *
 	 * @return string
 	 */ 
@@ -145,7 +149,7 @@ class PollForm extends Form {
 		}
 		$labels = implode('|', $labels); 
 		$data = implode(',', $data);
-		$max = (int)(($this->poll->maxVotes()+1) * 1.5);
+		$max = (int)(($this->poll->getMaxVotes()+1) * 1.5);
 		$height = $this->chartOptions['height'];
 		$width = $this->chartOptions['width'];
 		$colours = implode($this->chartOptions['colours'], '|');

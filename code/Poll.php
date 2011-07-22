@@ -116,7 +116,7 @@ class Poll extends DataObject implements PermissionProvider {
 	 * 
 	 * @return int
 	 */ 
-	function totalVotes($useCache = true) {
+	function getTotalVotes($useCache = true) {
 		static $_cache;
 		if (!isset($_cache) || !$useCache) {
 			$query = DB::query('SELECT SUM("Votes") As "Total" FROM "PollChoice" WHERE "PollID" = ' . $this->ID); 
@@ -131,7 +131,7 @@ class Poll extends DataObject implements PermissionProvider {
 	 * Find out what is the maximum amount of votes received for one of the options.
 	 * TODO: rewrite as Aggregate, so it uses in-built cache?
 	 */
-	function maxVotes($useCache = true) {
+	function getMaxVotes($useCache = true) {
 		static $_cache;
 		if (!isset($_cache) || !$useCache) {
 			$query = DB::query('SELECT MAX("Votes") As "Max" FROM "PollChoice" WHERE "PollID" = ' . $this->ID); 
