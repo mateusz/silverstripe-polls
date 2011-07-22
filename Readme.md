@@ -30,10 +30,9 @@ SilverStripe 2.4.x
 1. Create a poll, press _Add_, then add a few poll options
 1. The further steps depend on how the PollForm has been implemented
 
-### Embed and configure the PollForm
+### Embed PollForm in your template
 
-The PollForm knows how to render itself, and is able to render both the selection form and the chart, depending on the value detected in the cookie. 
-To embed the PollForm you can create it through your SiteTree object.
+The PollForm knows how to render itself, and is able to render both the selection form and the chart, depending on the value detected in the cookie. It's enough then to include a PollForm in your template. How you create the PollFom object and pass it to the template is up to you, but here's a suggestion: you can create it through your SiteTree object:
 
 	class Page extends SiteTree {
 		static $has_one = array(
@@ -54,26 +53,9 @@ To embed the PollForm you can create it through your SiteTree object.
 		...
 	}
 
-To customise the chart even more, you can subclass the PollForm and redefine the **getChart** method.
-If you want to make a site-wide changes, you can use a decorator as well. For example the following
-will give you a text-only rendering of results.
+### Customise the chart
 
-	class PollFormDecorator extends DataObjectDecorator {
-		function replaceChart() {
-			$choices = $this->owner->Poll()->Choices('', '"Order" ASC');
-
-			$results = array();
-			if ($choices) foreach($choices as $choice) {
-				$results[] = "{$choice->Title}: {$choice->Votes}";
-			}
-
-			return implode($results, '<br/>');
-		}
-	}
-
-	Object::add_extension('PollForm', 'PollFormDecorator');
-
-Then, if you need to modify the form and chart template, have a look at **PollForm.ss**. Here is the default setup.
+You can obtain a good deal of control by redefining the **PollForm.ss** template in your **theme** folder. Here is the default setup:
 
 	<% if Poll.Visible %>
 		<h3>$Poll.Title</h3>
@@ -90,3 +72,57 @@ Then, if you need to modify the form and chart template, have a look at **PollFo
 			$DefaultForm
 		<% end_if %>
 	<% end_if %>
+
+And here is advanced setup that renders the poll as simple HTML blocks, using some of polls API functions:
+
+	<% if Poll.Visible %>
+		<div class="poll">
+			<% if Poll.Image %>
+				<div class="thumbnail">
+					<img src="<% control Poll.Image %>$CroppedImage(150,50).URL<% end_control %>" alt="$Title"/>
+				</div>
+			<% end_if %>
+			<% if Poll.Title %>
+				<h3>$Poll.Title</h3>
+			<% end_if %>
+			<% if Poll.Description %>
+				<p>$Poll.Description<br/></p>
+			<% end_if %>
+
+			<% if shouldShowResults %>
+				<div class='poll-results'>
+					<% control Poll.Choices %>
+						<div class='poll-results-entry poll-results-entry-$EvenOdd'>
+							$Title $Percentage - $Votes:
+							<div style='width: $Percentage;'>&nbsp;</div>
+						</div>
+					<% end_control %>
+				</div>
+			<% else %>
+				$DefaultForm
+			<% end_if %>
+
+			<p class='poll-total'>Total votes: $Poll.TotalVotes</p>
+		</div>
+	<% end_if %>
+
+If you want to make a site-wide changes, you can use a decorator and define **replaceChart** function. For example the following
+will give you a text-only rendering of results:
+
+	class PollFormDecorator extends DataObjectDecorator {
+		function replaceChart() {
+			$choices = $this->owner->Poll()->Choices('', '"Order" ASC');
+
+			$results = array();
+			if ($choices) foreach($choices as $choice) {
+				$results[] = "{$choice->Title}: {$choice->Votes}";
+			}
+
+			return implode($results, '<br/>');
+		}
+	}
+
+	Object::add_extension('PollForm', 'PollFormDecorator');
+
+
+Finally, for a full control of the poll form and the results subclass the PollForm - you can then create form-specific templates or work on the basis of redefining the **getChart** method. This way you can also create multiple parallel presentation layers for the polls.
