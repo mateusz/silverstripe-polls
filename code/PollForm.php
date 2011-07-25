@@ -3,6 +3,11 @@ class PollForm extends Form {
 	
 	static $show_results_link = false; 
 	
+	/**
+	 * After submission, redirect back to the # anchor. Set to null to disable the feature.
+	 */
+	static $redirect_to_anchor = 'SSPoll';
+	
 	protected $poll;
 
 	protected $chartOptions = array(
@@ -60,7 +65,22 @@ class PollForm extends Form {
 			}
 		}
 		
-		Director::redirectBack();
+		// Redirect back to anchor (partly copied from Director::redirectBack)
+		if (self::$redirect_to_anchor) {
+			if($this->request->requestVar('_REDIRECT_BACK_URL')) {
+				$url = $this->request->requestVar('_REDIRECT_BACK_URL');
+			} else if($this->request->getHeader('Referer')) {
+				$url = $this->request->getHeader('Referer');
+			} else {
+				$url = Director::baseURL();
+			}
+			$url .= '#'.self::$redirect_to_anchor.'-'.$this->poll->ID;
+
+			Director::redirect($url);
+		}
+		else {
+			Director::redirectBack();
+		}
 	}
 
 	/**

@@ -39,8 +39,10 @@ class Poll extends DataObject implements PermissionProvider {
 	static $default_sort = 'Created DESC';
 	
 	function getCMSFields() {
+		Requirements::javascript('polls/javascript/polls.js');
+
 		if($this->ID != 0) {
-			$totalCount = $this->totalVotes();
+			$totalCount = $this->getTotalVotes();
 		}
 		else {
 			$totalCount = 0;
@@ -90,7 +92,7 @@ class Poll extends DataObject implements PermissionProvider {
 			$fields->addFieldToTab('Root.Data', $pollChoicesTable);
 
 			$fields->addFieldToTab('Root.Data', new ReadonlyField('Total', 'Total votes', $totalCount));
-
+			
 			// Display the results using the default poll chart
 			$pollForm = new PollForm(new Controller(), 'PollForm', $this);
 			$chartTab = new Tab("Result chart", new LiteralField('Chart', sprintf(

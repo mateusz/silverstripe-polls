@@ -47,7 +47,7 @@ class PollChoice extends DataObject {
 
 		$fields->push(new TextField('Order')); 
 		$fields->push(new TextField('Title', 'Answer option', '', 80));
-		$fields->push(new ReadonlyField('Votes'));
+		$fields->push(new TextField('Votes', 'Manipulate votes'));
 
 		return $fields;
     }
