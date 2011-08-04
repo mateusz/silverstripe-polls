@@ -2,8 +2,6 @@
 
 ## Maintainer 
 
-[Saophalkun Ponlu](mailto:phalkunz@silverstripe.com)
-
 [Mateusz Uzdowski](mailto:mateusz@silverstripe.com)
 
 ## Requirements 
@@ -57,21 +55,23 @@ The PollForm knows how to render itself, and is able to render both the selectio
 
 You can obtain a good deal of control by redefining the **PollForm.ss** template in your **theme** folder. Here is the default setup:
 
-	<% if Poll.Visible %>
-		<h3>$Poll.Title</h3>
-		<% if Image %>
-			$Poll.Image.ResizedImage(300,200)
-		<% end_if %>
-		<% if Description %>
-			$Poll.Description
-		<% end_if %>
-
-		<% if Poll.isVoted %>
-			$Chart
-		<% else %>
-			$DefaultForm
-		<% end_if %>
+```html
+<% if Poll.Visible %>
+	<h3>$Poll.Title</h3>
+	<% if Image %>
+		$Poll.Image.ResizedImage(300,200)
 	<% end_if %>
+	<% if Description %>
+		$Poll.Description
+	<% end_if %>
+
+	<% if Poll.isVoted %>
+		$Chart
+	<% else %>
+		$DefaultForm
+	<% end_if %>
+<% end_if %>
+```
 
 And here is advanced setup that renders the poll as simple HTML blocks, using some of polls API functions:
 
@@ -93,8 +93,8 @@ And here is advanced setup that renders the poll as simple HTML blocks, using so
 				<div class='poll-results'>
 					<% control Poll.Choices %>
 						<div class='poll-results-entry poll-results-entry-$EvenOdd'>
-							$Title $Percentage - $Votes:
-							<div style='width: $Percentage;'>&nbsp;</div>
+							<span><em>$Title $PercentageOfTotal ($Votes):</em></span>
+							<div style='width: $PercentageOfMax;'>&nbsp;</div>
 						</div>
 					<% end_control %>
 				</div>
