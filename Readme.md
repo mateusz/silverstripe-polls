@@ -28,9 +28,11 @@ SilverStripe 2.4.x
 1. Create a poll, press _Add_, then add a few poll options
 1. The further steps depend on how the PollForm has been implemented
 
-### Embed PollForm in your template
+### Connect Poll object with PollForm
 
-The PollForm knows how to render itself, and is able to render both the selection form and the chart, depending on the value detected in the cookie. It's enough then to include a PollForm in your template. How you create the PollFom object and pass it to the template is up to you, but here's a suggestion: you can create it through your SiteTree object:
+The PollForm knows how to render itself, and is able to render both the selection form and the chart. It needs to get a Poll object as its input though, and it's up to you to provide it: it will depend on your project how you will want to do this.
+
+Here is the most basic example of how to associate one Poll with each Page:
 
 ```php
 class Page extends SiteTree {
@@ -38,6 +40,40 @@ class Page extends SiteTree {
 		'Poll' => 'Poll'
 	);
 
+	...
+
+	function getCMSFields() {
+		$fields = parent::getCMSFields();
+		
+		$polls = DataObject::get('Poll');
+		if ($polls) { 
+			$pollsMap = $polls->toDropdownMap('ID', 'Title', '--- Select a poll ---');
+			$fields->addFieldsToTab('Root.Content.Main', array(
+				new DropdownField('PollID', 'Poll', $pollsMap)
+			));
+		}
+		else {
+			$fields->addFieldsToTab('Root.Content.Main', array(
+				new LiteralField('Heading', '<h1>No polls available</h1>'),
+				new LiteralField('PollID', '<p>There are no polls available. Please use <a href="admin/polls">the polls section</a> to add them.</p>')
+			));
+		}
+
+		return $fields;
+	}
+
+	...
+}
+```
+
+Now you should be able to visit your page in the CMS and select the poll from the new dropdown.
+
+### Embed PollForm in your template
+
+Here's a suggestion how to create and expose a PollForm to all your templates:
+
+```php
+class Page_Controller extends ContentController {
 	...
 
 	function PollForm() {
@@ -52,6 +88,8 @@ class Page extends SiteTree {
 	...
 }
 ```
+
+With this, you can use $PollForm in your template to specify where you want the poll to show up. This will give you an empty string though, if the Poll passed to PollForm is null, so make sure you are giving it a valid input.
 
 ### Customise the chart
 
