@@ -31,26 +31,17 @@ class PollChoice extends DataObject {
 	function getCMSFields() {
 		$polls = DataObject::get('Poll', '"IsActive" = 1'); 
 		$pollsMap = array();
-		if($polls) $pollsMap = $polls->toDropDownMap('ID', 'Title', '--- Select a poll ---');
+		if($polls) $pollsMap = $polls->map('ID', 'Title', '--- Select a poll ---');
 		
-		$fields = new FieldSet(
+		$fields = new FieldList(
 			new TextField('Title', '', '', 80),
 			new DropdownField('PollID', 'Belongs to', $pollsMap),
 			new ReadonlyField('Votes')
+			//new TextField('Order')
 		); 
 		
 		return $fields; 
 	}
-	
-	static function getCMSFields_forPopup() {
-		$fields = new FieldSet();
-
-		$fields->push(new TextField('Order')); 
-		$fields->push(new TextField('Title', 'Answer option', '', 80));
-		$fields->push(new TextField('Votes', 'Manipulate votes'));
-
-		return $fields;
-    }
 	
 	/** 
 	 * Increase vote by one and mark its poll has voted
