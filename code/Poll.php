@@ -37,7 +37,7 @@ class Poll extends DataObject implements PermissionProvider {
 	); 
 	
 	static $default_sort = 'Created DESC';
-	
+
 	function getCMSFields() {
 		Requirements::javascript('polls/javascript/polls.js');
 
@@ -118,30 +118,32 @@ class Poll extends DataObject implements PermissionProvider {
 	 * 
 	 * @return int
 	 */ 
+	private $_getTotalVotesCache;
+
 	function getTotalVotes($useCache = true) {
-		static $_cache;
-		if (!isset($_cache) || !$useCache) {
+		if (!isset($_getTotalVotesCache) || !$useCache) {
 			$query = DB::query('SELECT SUM("Votes") As "Total" FROM "PollChoice" WHERE "PollID" = ' . $this->ID); 
 			$res = $query->nextRecord();
-			$_cache = $res['Total'];
+			$_getTotalVotesCache = $res['Total'];
 		}
 
-		return $_cache;
+		return $_getTotalVotesCache;
 	}
 
 	/**
 	 * Find out what is the maximum amount of votes received for one of the options.
 	 * TODO: rewrite as Aggregate, so it uses in-built cache?
 	 */
+	private $_getMaxVotesCache;
+
 	function getMaxVotes($useCache = true) {
-		static $_cache;
-		if (!isset($_cache) || !$useCache) {
+		if (!isset($_getMaxVotesCache) || !$useCache) {
 			$query = DB::query('SELECT MAX("Votes") As "Max" FROM "PollChoice" WHERE "PollID" = ' . $this->ID); 
 			$res = $query->nextRecord();
-			$_cache = $res['Max'];
+			$_getMaxVotesCache = $res['Max'];
 		}
 
-		return $_cache;
+		return $_getMaxVotesCache;
 	}
 	
 	/**
