@@ -48,7 +48,7 @@ class Poll extends DataObject implements PermissionProvider {
 			$totalCount = 0;
 		}
 		
-		$fields = new FieldSet(
+		$fields = new FieldList(
 			$rootTab = new TabSet("Root",
 				new Tab("Main",
 					new TextField('Title', 'Poll title (maximum 50 characters)', null, 50),
@@ -57,7 +57,7 @@ class Poll extends DataObject implements PermissionProvider {
 					$embargo = new DatetimeField('Embargo', 'Embargo'),
 					$expiry = new DatetimeField('Expiry', 'Expiry'),
 					new HTMLEditorField('Description', 'Description', 12),
-					$image = new ImageField('Image', 'Poll image')
+					$image = new UploadField('Image', 'Poll image')
 				)
 			)
 		);
@@ -74,21 +74,25 @@ class Poll extends DataObject implements PermissionProvider {
 		
 		// Add the fields that depend on the poll being already saved and having an ID 
 		if($this->ID != 0) {
-			$pollChoicesTable = new ComplexTableField(
-				$this,
-				'Choices', // relation name
-				'PollChoice', // object class
-				array(
-					'Order' => '#',
-					'Title' => 'Answer option',
-					'Votes' => 'Votes'
-				), // fields to show in table
-				PollChoice::getCMSFields_forPopup(), // form that pops up for edit
-				'"PollID" = ' . $this->ID // a filter to only display item associated with this poll
-				);
-			$pollChoicesTable->setAddTitle( 'a poll choice' );
-			$pollChoicesTable->setParentClass('Poll');
-			$pollChoicesTable->setPermissions(array("add", "edit", "show", "delete", "export"));
+
+			
+			$config = GridFieldConfig::create();
+			$config->addComponent(new GridFieldToolbarHeader());
+			$config->addComponent(new GridFieldAddNewButton('toolbar-header-right'));
+			$config->addComponent(new GridFieldDataColumns());
+			$config->addComponent(new GridFieldEditButton());
+			$config->addComponent(new GridFieldDeleteAction());
+			$config->addComponent(new GridFieldDetailForm());
+			$config->addComponent(new GridFieldSortableHeader());
+			$config->addComponent(new GridFieldSortableRows('Order'));
+			
+			$pollChoicesTable = new GridField(
+				'Choices',
+				'Choices',
+				$this->Choices(),
+				$config
+			);
+
 			$fields->addFieldToTab('Root.Data', $pollChoicesTable);
 
 			$fields->addFieldToTab('Root.Data', new ReadonlyField('Total', 'Total votes', $totalCount));

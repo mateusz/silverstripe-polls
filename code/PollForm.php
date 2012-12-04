@@ -35,7 +35,7 @@ class PollForm extends Form {
 			$choiceField = new OptionsetField('PollChoices', '', $data);
 		}
 		
-		$fields =  new FieldSet(
+		$fields =  new FieldList(
 			$choiceField
 		);
 		
@@ -45,7 +45,7 @@ class PollForm extends Form {
 			$fields->push($showResultsLink); 
 		}
 		
-		$actions = new FieldSet(
+		$actions = new FieldList(
 			new FormAction('submitPoll', 'Submit', null, null, 'button')
 		);
 
