@@ -26,18 +26,16 @@ class PollFormTest extends FunctionalTest {
 		$poll = DataObject::get_one('Poll');
 		$response = $this->get('TestPollForm_Controller', '', '', array('SSPoll_' . $poll->ID => true));
 
-		// Create a poll from scratch to compare
-		$pollForm = new PollForm(new Controller(), 'PollForm', $poll);
-		$this->assertContains($pollForm->getChart(), $this->content());
+		$selected = $this->cssParser()->getBySelector('form#PollForm_PollForm');
+		$this->assertEquals(count($selected), 0, 'Input form is not shown');
 	}
 
 	function testForcedDisplay() {
 		$poll = DataObject::get_one('Poll');
 		$response = $this->get('TestPollForm_Controller?poll_results');
 
-		// Create a poll from scratch to compare
-		$pollForm = new PollForm(new Controller(), 'PollForm', $poll);
-		$this->assertContains($pollForm->getChart(), $this->content());
+		$selected = $this->cssParser()->getBySelector('form#PollForm_PollForm');
+		$this->assertEquals(count($selected), 0, 'Input form is not shown');
 	}
 }
 
