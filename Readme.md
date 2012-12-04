@@ -6,7 +6,7 @@
 
 ## Requirements 
 
-SilverStripe 2.4.x
+SilverStripe 3.0.x
 
 ## Installation 
 
@@ -30,7 +30,9 @@ SilverStripe 2.4.x
 
 ### Connect Poll object with PollForm
 
-The PollForm knows how to render itself, and is able to render both the selection form and the chart. It needs to get a Poll object as its input though, and it's up to you to provide it: it will depend on your project how you will want to do this.
+The PollForm knows how to render itself, and is able to render both the selection form and the chart. It needs to get a
+Poll object as its input though, and it's up to you to provide it: it will depend on your project how you will want to
+do this.
 
 Here is the most basic example of how to associate one Poll with each Page:
 
@@ -42,25 +44,25 @@ class Page extends SiteTree {
 
 	...
 
-	function getCMSFields() {
-		$fields = parent::getCMSFields();
-		
-		$polls = DataObject::get('Poll');
-		if ($polls) { 
-			$pollsMap = $polls->toDropdownMap('ID', 'Title', '--- Select a poll ---');
-			$fields->addFieldsToTab('Root.Content.Main', array(
-				new DropdownField('PollID', 'Poll', $pollsMap)
-			));
-		}
-		else {
-			$fields->addFieldsToTab('Root.Content.Main', array(
-				new LiteralField('Heading', '<h1>No polls available</h1>'),
-				new LiteralField('PollID', '<p>There are no polls available. Please use <a href="admin/polls">the polls section</a> to add them.</p>')
-			));
-		}
+    function getCMSFields() {
+        $fields = parent::getCMSFields();
 
-		return $fields;
-	}
+        $polls = Poll::get();
+        if ($polls) { 
+            $fields->addFieldsToTab('Root.Main', array(
+                new DropdownField('PollID', 'Poll', $polls->map(), $this->PollID, null, '--- Select a poll ---')
+            ));
+        }
+        else {
+            $fields->addFieldsToTab('Root.Main', array(
+                new LiteralField('Heading', '<h1>No polls available</h1>'),
+				new LiteralField('PollID', '<p>There are no polls available. Please use <a href="admin/polls">the polls
+					section</a> to add them.</p>')
+            ));
+        }
+
+        return $fields;
+    }
 
 	...
 }
@@ -89,11 +91,19 @@ class Page_Controller extends ContentController {
 }
 ```
 
-With this, you can use $PollForm in your template to specify where you want the poll to show up. This will give you an empty string though, if the Poll passed to PollForm is null, so make sure you are giving it a valid input.
+You will then be able to embed this form in your template like that:
+
+```php
+$PollForm
+```
+
+This allows you to specify where you want the poll to show up. The poll will not appear if the related `SiteTree` object
+has no poll associated with it (i.e. $this->Poll() is empty).
 
 ### Customise the chart
 
-You can obtain a good deal of control by redefining the **PollForm.ss** template in your **theme** folder. Here is the default setup:
+You can obtain a good deal of control by redefining the **PollForm.ss** template in your **theme** folder. Here is the
+default setup:
 
 ```html
 <% if Poll.Visible %>
@@ -148,8 +158,8 @@ And here is advanced setup that renders the poll as simple HTML blocks, using so
 <% end_if %>
 ```
 
-If you want to make a site-wide changes, you can use a decorator and define **replaceChart** function. For example the following
-will give you a text-only rendering of results:
+If you want to make a site-wide changes, you can use a decorator and define **replaceChart** function. For example the
+following will give you a text-only rendering of results:
 
 ```php
 class PollFormDecorator extends DataObjectDecorator {
@@ -169,4 +179,6 @@ Object::add_extension('PollForm', 'PollFormDecorator');
 ```
 
 
-Finally, for a full control of the poll form and the results subclass the PollForm - you can then create form-specific templates or work on the basis of redefining the **getChart** method. This way you can also create multiple parallel presentation layers for the polls.
+Finally, for a full control of the poll form and the results subclass the PollForm - you can then create form-specific
+templates or work on the basis of redefining the **getChart** method. This way you can also create multiple parallel
+presentation layers for the polls.

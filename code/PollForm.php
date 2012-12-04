@@ -76,10 +76,10 @@ class PollForm extends Form {
 			}
 			$url .= '#'.self::$redirect_to_anchor.'-'.$this->poll->ID;
 
-			Director::redirect($url);
+			$this->controller->redirect($url);
 		}
 		else {
-			Director::redirectBack();
+			$this->controller->redirectBack();
 		}
 	}
 

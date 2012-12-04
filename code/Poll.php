@@ -56,7 +56,7 @@ class Poll extends DataObject implements PermissionProvider {
 					new OptionsetField('IsActive', 'Poll state', array(1 => 'Active', 0 => 'Inactive')),
 					$embargo = new DatetimeField('Embargo', 'Embargo'),
 					$expiry = new DatetimeField('Expiry', 'Expiry'),
-					new HTMLEditorField('Description', 'Description', 12),
+					new HTMLEditorField('Description', 'Description'),
 					$image = new UploadField('Image', 'Poll image')
 				)
 			)
@@ -71,7 +71,7 @@ class Poll extends DataObject implements PermissionProvider {
 		$expiry->getTimeField()->setConfig('showdropdown', true);
 		$expiry->getDateField()->setConfig('dateformat', 'dd/MM/YYYY');
 		$expiry->getTimeField()->setConfig('timeformat', 'h:m a');
-		
+
 		// Add the fields that depend on the poll being already saved and having an ID 
 		if($this->ID != 0) {
 
@@ -84,7 +84,6 @@ class Poll extends DataObject implements PermissionProvider {
 			$config->addComponent(new GridFieldDeleteAction());
 			$config->addComponent(new GridFieldDetailForm());
 			$config->addComponent(new GridFieldSortableHeader());
-			$config->addComponent(new GridFieldSortableRows('Order'));
 			
 			$pollChoicesTable = new GridField(
 				'Choices',
