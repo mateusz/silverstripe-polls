@@ -6,7 +6,8 @@
 
 ## Requirements 
 
-SilverStripe 3.0.x
+master: SilverStripe 3.0.x
+0.1: SilverStripe 2.4.x
 
 ## Installation 
 
