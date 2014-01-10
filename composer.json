@@ -1,0 +1,18 @@
+{
+	"name": "mateusz/silverstripe-polls",
+		"description": "Poll module for SilverStripe",
+		"type": "silverstripe-module",
+		"keywords": ["silverstripe", "polls", "forms"],
+		"license": "BSD-3-Clause",
+		"authors": [
+			{
+				"name": "Mateusz Uzdowski",
+				"email": "mateusz@silverstripe.com"
+			}
+		],
+		"require":
+		{
+			"silverstripe/framework": "~3.1.2",
+			"silverstripe/cms": "~3.1.2"
+		}
+}
