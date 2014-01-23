@@ -23,7 +23,7 @@ class PollChoiceTest extends SapphireTest {
 		$choice = $this->ObjFromFixture('PollChoice', 'android');
 		$choice->addVote();
 		// This cannot be tested this way as it relies on cookies.
-		// $this->assertTrue($choice->Poll()->isVoted());
+		// $this->assertTrue($choice->Poll()->hasVoted());
 		$this->assertEquals($choice->Votes, 81, 'Vote count incremented');
 	}
 }

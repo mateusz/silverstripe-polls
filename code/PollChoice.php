@@ -49,7 +49,7 @@ class PollChoice extends DataObject {
 	function addVote() {
 		$poll = $this->Poll();
 		
-		if($poll && !$poll->isVoted()) {
+		if($poll && !$poll->hasVoted()) {
 			$this->Votes++;
 			$this->write();
 			$poll->markAsVoted();
