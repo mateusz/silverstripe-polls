@@ -162,7 +162,7 @@ class Poll extends DataObject implements PermissionProvider {
 	 * @param integer
 	 * @return bool 
 	 */
-	function isVoted() {
+	function hasVoted() {
 		$cookie = Cookie::get(self::COOKIE_PREFIX . $this->ID);
 	
 		if($cookie) {
@@ -171,6 +171,14 @@ class Poll extends DataObject implements PermissionProvider {
 		else {
 			return false;
 		}
+	}
+
+	/**
+	 * @deprecated
+	 */
+	function isVoted() {
+		Deprecation::notice('0.1', "isVoted has been deprecated, please use hasVoted");
+		return $this->hasVoted();
 	}
 
 	/**

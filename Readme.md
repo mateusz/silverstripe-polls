@@ -116,7 +116,7 @@ default setup:
 		$Poll.Description
 	<% end_if %>
 
-	<% if Poll.isVoted %>
+	<% if Poll.hasVoted %>
 		$Chart
 	<% else %>
 		$DefaultForm
