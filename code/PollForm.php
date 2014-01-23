@@ -63,6 +63,7 @@ class PollForm extends Form {
 			foreach($choices as $choice) {
 				$choice->addVote();
 			}
+			$form->poll->markAsVoted();
 		}
 		
 		// Redirect back to anchor (partly copied from Director::redirectBack)
