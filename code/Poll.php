@@ -39,7 +39,6 @@ class Poll extends DataObject implements PermissionProvider {
 	static $default_sort = 'Created DESC';
 
 	function getCMSFields() {
-		Requirements::javascript('polls/javascript/polls.js');
 
 		if($this->ID != 0) {
 			$totalCount = $this->getTotalVotes();
