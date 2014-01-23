@@ -125,9 +125,7 @@ class Poll extends DataObject implements PermissionProvider {
 
 	function getTotalVotes($useCache = true) {
 		if (!isset($_getTotalVotesCache) || !$useCache) {
-			$query = DB::query('SELECT SUM("Votes") As "Total" FROM "PollChoice" WHERE "PollID" = ' . $this->ID); 
-			$res = $query->nextRecord();
-			$_getTotalVotesCache = $res['Total'];
+			$_getTotalVotesCache = $this->Choices()->sum('Votes');
 		}
 
 		return $_getTotalVotesCache;
@@ -141,9 +139,7 @@ class Poll extends DataObject implements PermissionProvider {
 
 	function getMaxVotes($useCache = true) {
 		if (!isset($_getMaxVotesCache) || !$useCache) {
-			$query = DB::query('SELECT MAX("Votes") As "Max" FROM "PollChoice" WHERE "PollID" = ' . $this->ID); 
-			$res = $query->nextRecord();
-			$_getMaxVotesCache = $res['Max'];
+			$_getMaxVotesCache = $this->Choices()->max('Votes');
 		}
 
 		return $_getMaxVotesCache;

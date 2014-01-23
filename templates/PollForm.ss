@@ -1,16 +1,16 @@
-<% if Poll.Visible %>
+<% if $Poll.Visible %>
 	<h3>$Poll.Title</h3>
 	
-	<% if Poll.Image %>
+	<% if $Poll.Image %>
 		$Poll.Image.ResizedImage(300,200)
 	<% end_if %>
 	
 	
-	<% if Poll.Description %>
+	<% if $Poll.Description %>
 		$Poll.Description
 	<% end_if %>
 
-	<% if ShouldShowResults %>
+	<% if $ShouldShowResults %>
 		$Chart
 	<% else %>
 		$DefaultForm
