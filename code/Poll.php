@@ -38,6 +38,16 @@ class Poll extends DataObject implements PermissionProvider {
 	
 	static $default_sort = 'Created DESC';
 
+	private static $vote_handler_class = 'CookieVoteHandler';
+
+	public $voteHandler;
+
+	public function __construct($record = null, $isSingleton = false, $model = null) {
+		parent::__construct($record, $isSingleton, $model);
+		//create the voteHandler
+		$this->voteHandler = Injector::inst()->create(self::config()->get('vote_handler_class'), $this);
+	}
+
 	function getCMSFields() {
 		Requirements::javascript('polls/javascript/polls.js');
 
@@ -115,38 +125,12 @@ class Poll extends DataObject implements PermissionProvider {
 		return $fields; 
 	}
 
-	/**
-	 * Returns the number of total votes, the sum of all votes from {@link PollChoice}s' votes
-	 * TODO: rewrite as Aggregate, so it uses in-built cache?
-	 * 
-	 * @return int
-	 */ 
-	private $_getTotalVotesCache;
-
-	function getTotalVotes($useCache = true) {
-		if (!isset($_getTotalVotesCache) || !$useCache) {
-			$query = DB::query('SELECT SUM("Votes") As "Total" FROM "PollChoice" WHERE "PollID" = ' . $this->ID); 
-			$res = $query->nextRecord();
-			$_getTotalVotesCache = $res['Total'];
-		}
-
-		return $_getTotalVotesCache;
+	function getTotalVotes() {
+		return $this->Choices()->sum('Votes');
 	}
 
-	/**
-	 * Find out what is the maximum amount of votes received for one of the options.
-	 * TODO: rewrite as Aggregate, so it uses in-built cache?
-	 */
-	private $_getMaxVotesCache;
-
-	function getMaxVotes($useCache = true) {
-		if (!isset($_getMaxVotesCache) || !$useCache) {
-			$query = DB::query('SELECT MAX("Votes") As "Max" FROM "PollChoice" WHERE "PollID" = ' . $this->ID); 
-			$res = $query->nextRecord();
-			$_getMaxVotesCache = $res['Max'];
-		}
-
-		return $_getMaxVotesCache;
+	function getMaxVotes() {
+		return $this->Choices()->max('Votes');
 	}
 	
 	/**
@@ -163,14 +147,7 @@ class Poll extends DataObject implements PermissionProvider {
 	 * @return bool 
 	 */
 	function hasVoted() {
-		$cookie = Cookie::get(self::COOKIE_PREFIX . $this->ID);
-	
-		if($cookie) {
-			return true; 
-		}
-		else {
-			return false;
-		}
+		return $this->voteHandler->hasVoted();
 	}
 
 	/**
@@ -211,5 +188,9 @@ class Poll extends DataObject implements PermissionProvider {
 	
 	public function canDelete($member = null) {
 		return Permission::check('MANAGE_POLLS', 'any', $member);
+	}
+
+	public function canVote() {
+		return $this->voteHandler->canVote();
 	}
 }
