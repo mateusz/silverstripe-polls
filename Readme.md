@@ -107,16 +107,16 @@ You can obtain a good deal of control by redefining the **PollForm.ss** template
 default setup:
 
 ```html
-<% if Poll.Visible %>
+<% if $Poll.Visible %>
 	<h3>$Poll.Title</h3>
-	<% if Image %>
+	<% if $Image %>
 		$Poll.Image.ResizedImage(300,200)
 	<% end_if %>
-	<% if Description %>
+	<% if $Description %>
 		$Poll.Description
 	<% end_if %>
 
-	<% if Poll.isVoted %>
+	<% if $Poll.isVoted %>
 		$Chart
 	<% else %>
 		$DefaultForm
@@ -127,21 +127,21 @@ default setup:
 And here is advanced setup that renders the poll as simple HTML blocks, using some of polls API functions:
 
 ```html
-<% if Poll.Visible %>
+<% if $Poll.Visible %>
 	<div class="poll">
-		<% if Poll.Image %>
+		<% if $Poll.Image %>
 			<div class="thumbnail">
 				<img src="<% control Poll.Image %>$CroppedImage(150,50).URL<% end_control %>" alt="$Title"/>
 			</div>
 		<% end_if %>
-		<% if Poll.Title %>
+		<% if $Poll.Title %>
 			<h3>$Poll.Title</h3>
 		<% end_if %>
-		<% if Poll.Description %>
+		<% if $Poll.Description %>
 			<p>$Poll.Description<br/></p>
 		<% end_if %>
 
-		<% if shouldShowResults %>
+		<% if $shouldShowResults %>
 			<div class='poll-results'>
 				<% control Poll.Choices %>
 					<div class='poll-results-entry poll-results-entry-$EvenOdd'>
