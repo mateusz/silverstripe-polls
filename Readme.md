@@ -51,7 +51,7 @@ class Page extends SiteTree {
         $polls = Poll::get();
         if ($polls) { 
             $fields->addFieldsToTab('Root.Main', array(
-                new DropdownField('PollID', 'Poll', $polls->map(), $this->PollID, null, '--- Select a poll ---')
+                DropdownField::create('PollID', 'Poll', $polls->map(), $this->PollID)->setEmptyString('--- Select a poll ---'),
             ));
         }
         else {
