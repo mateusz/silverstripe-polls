@@ -25,18 +25,18 @@ class Poll extends DataObject implements PermissionProvider {
 	);
 	
 	static $searchable_fields = array(
-		'Title', 
+		'Title',
 		'IsActive'
 	);
-	
+
 	static $summary_fields = array(
 		'Title',
 		'IsActive',
 		'Embargo',
 		'Expiry'
 	); 
-	
-	static $default_sort = 'Created DESC';
+
+	static $default_sort = 'Title ASC';
 
 	private static $vote_handler_class = 'CookieVoteHandler';
 
