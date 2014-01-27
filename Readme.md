@@ -16,7 +16,7 @@ master: SilverStripe 3.0.x
 
 ## Features
 
-- Each visitor, determined by browser cookie, can only vote once 
+- By default, each visitor, determined by browser cookie, can only vote once
 - Uses [Google chart API](http://code.google.com/apis/chart/) 
 - Supports single and multiple-choice polls
 
@@ -116,7 +116,7 @@ default setup:
 		$Poll.Description
 	<% end_if %>
 
-	<% if $Poll.isVoted %>
+	<% if $Poll.hasVoted %>
 		$Chart
 	<% else %>
 		$DefaultForm
@@ -183,3 +183,12 @@ Object::add_extension('PollForm', 'PollFormDecorator');
 Finally, for a full control of the poll form and the results subclass the PollForm - you can then create form-specific
 templates or work on the basis of redefining the **getChart** method. This way you can also create multiple parallel
 presentation layers for the polls.
+
+#### Custom Vote Handling
+
+Using the Vote_Backend we can define our own vote handler. The votehandler takes care of storing votes and the logic of
+whether a user has voted before.
+
+See `DatabaseVoteHandler` for an example.
+
+

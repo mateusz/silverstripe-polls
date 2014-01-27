@@ -56,7 +56,7 @@ class PollTest extends SapphireTest {
 		/*
 		$mobilePoll = $this->ObjFromFixture('Poll', 'mobile-poll');
 		$mobilePoll->markAsVoted();
-		$this->assertTrue($mobilePoll->isVoted());
+		$this->assertTrue($mobilePoll->hasVoted());
 		*/
 	}
 }
