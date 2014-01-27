@@ -129,7 +129,7 @@ class PollForm extends Form {
 	 * Collate the information from PollForm and Poll to figure out if the results should be shown.
 	 */
 	function getShouldShowResults() {
-		return $this->poll->hasVoted() || $this->isForcedDisplay(); 
+		return $this->poll->canVote() || $this->isForcedDisplay(); 
 	}
 
 	/**
