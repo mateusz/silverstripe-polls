@@ -136,7 +136,7 @@ class Poll extends DataObject implements PermissionProvider {
 	 * Mark the the poll has been voted by the user, which determined by browser cookie
 	 */
 	function markAsVoted() {
-		Cookie::set(self::COOKIE_PREFIX . $this->ID, 1);
+		return $this->voteHandler->markAsVoted();
 	}
 	
 	/**
