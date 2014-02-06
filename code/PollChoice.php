@@ -29,13 +29,19 @@ class PollChoice extends DataObject {
 	static $default_sort = '"Order" ASC, "Created" ASC';
 	
 	function getCMSFields() {
-		$polls = DataObject::get('Poll');
-		$pollsMap = array();
-		if($polls) $pollsMap = $polls->map('ID', 'Title', '--- Select a poll ---');
-		
+		$activePolls = DataObject::get('Poll', '"IsActive" = 1');
+		$inactivePolls = DataObject::get('Poll', '"IsActive" = 0');
+
+		if($activePolls) $activePollsMap = $activePolls->map('ID', 'Title')->toArray();
+		if($inactivePolls) $inactivePollsMap = $inactivePolls->map('ID', 'Title')->toArray();
+
 		$fields = new FieldList(
 			new TextField('Title', 'Option', '', 80),
-			new DropdownField('PollID', 'Belongs to', $pollsMap),
+			new GroupedDropdownField('PollID', 'Belongs to',
+							array(
+								"Active" => $activePollsMap->toArray(),
+								"Inactive" => $inactivePollsMap->toArray()
+							)),
 			new ReadonlyField('Votes')
 			//new TextField('Order')
 		); 
