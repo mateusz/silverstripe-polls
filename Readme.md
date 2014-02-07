@@ -1,5 +1,7 @@
 # Polls module
 
+[![Build Status](https://secure.travis-ci.org/mateusz/silverstripe-polls.png)](http://travis-ci.org/mateusz/silverstripe-polls)
+
 ## Maintainer 
 
 [Mateusz Uzdowski](mailto:mateusz@silverstripe.com)
