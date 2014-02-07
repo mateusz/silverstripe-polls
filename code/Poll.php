@@ -36,7 +36,7 @@ class Poll extends DataObject implements PermissionProvider {
 		'Expiry'
 	); 
 	
-	static $default_sort = 'Created DESC';
+	static $default_sort = 'Title ASC';
 
 	private static $vote_handler_class = 'CookieVoteHandler';
 
