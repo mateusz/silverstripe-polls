@@ -1,12 +1,12 @@
-<?php 
+<?php
 class PollChoiceTest extends SapphireTest {
-	
+
 	static $fixture_file = 'polls/tests/Base.yml';
-	
+
 	function testGetPercentageOfMax() {
 		$choice = $this->ObjFromFixture('PollChoice', 'android');
 		$this->assertEquals('66%', $choice->getPercentageOfMax());
-		
+
 		$choice = $this->ObjFromFixture('PollChoice', 'green');
 		$this->assertEquals(0.50, number_format((double)$choice->getPercentageOfMax(false),3));
 	}
@@ -14,7 +14,7 @@ class PollChoiceTest extends SapphireTest {
 	function testGetPercentageOfTotal() {
 		$choice = $this->ObjFromFixture('PollChoice', 'android');
 		$this->assertEquals('37.7%', $choice->getPercentageOfTotal());
-		
+
 		$choice = $this->ObjFromFixture('PollChoice', 'green');
 		$this->assertEquals(0.294, number_format((double)$choice->getPercentageOfTotal(false),3));
 	}

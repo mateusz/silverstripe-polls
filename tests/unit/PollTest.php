@@ -1,16 +1,16 @@
-<?php 
+<?php
 class PollTest extends SapphireTest {
-	
+
 	static $fixture_file = 'polls/tests/Base.yml';
-	
+
 	function testTotalVotes() {
 		$mobilePoll = $this->ObjFromFixture('Poll', 'mobile-poll');
 		$this->assertEquals(120 + 80 + 12, $mobilePoll->getTotalVotes());
-		
+
 		$colorPoll = $this->ObjFromFixture('Poll', 'color-poll');
 		$this->assertEquals(6 + 15 + 30, $colorPoll->getTotalVotes());
 	}
-	
+
 	function testChartURL() {
 		$mobilePoll = $this->ObjFromFixture('Poll', 'mobile-poll');
 		$pollForm = new PollForm(new Controller(), 'PollForm', $mobilePoll);
