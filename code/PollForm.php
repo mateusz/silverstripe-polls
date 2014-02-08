@@ -1,12 +1,13 @@
 <?php
 class PollForm extends Form {
 	
-	static $show_results_link = false; 
+	private static
+		$show_results_link = false,
 	
 	/**
 	 * After submission, redirect back to the # anchor. Set to null to disable the feature.
 	 */
-	static $redirect_to_anchor = 'SSPoll';
+		$redirect_to_anchor = 'SSPoll';
 	
 	protected $poll;
 
