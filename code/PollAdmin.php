@@ -1,12 +1,10 @@
 <?php
 class PollAdmin extends ModelAdmin {
 	
-	static $url_segment = 'polls';
-	
-	static $menu_title = 'Polls';
-	
-	static $managed_models = array(
-		'Poll'
-	);
-	
+	private static
+		$url_segment = 'polls',		
+		$menu_title = 'Polls',
+		$managed_models = array(
+			'Poll'
+		);
 }

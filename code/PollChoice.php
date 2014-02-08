@@ -6,30 +6,27 @@
  */
 class PollChoice extends DataObject {
 	
-	static $db = Array(
-		'Title' => 'Varchar(255)',
-		'Votes' => 'Int',
-		'Order' => 'Int'
-	);
-	
-	static $has_one = Array(
-		'Poll' => 'Poll'
-	);
-	
-	static $searchable_fields = array(
-		'Title'
-	);
-
-	static $summary_fields = array(
-		'Order',
-		'Title',
-		'Votes'
-	); 
-	
-	static $default_sort = '"Order" ASC, "Created" ASC';
+	private static 
+		$db = Array(
+			'Title' => 'Varchar(255)',
+			'Votes' => 'Int',
+			'Order' => 'Int'
+		),
+		static $has_one = Array(
+			'Poll' => 'Poll'
+		),
+		static $searchable_fields = array(
+			'Title'
+		),
+		static $summary_fields = array(
+			'Order',
+			'Title',
+			'Votes'
+		),
+		static $default_sort = '"Order" ASC, "Created" ASC';
 	
 	function getCMSFields() {
-		$polls = DataObject::get('Poll', '"IsActive" = 1'); 
+		$polls = DataObject::get('Poll')->filter(array('IsActive'=>'1'));
 		$pollsMap = array();
 		if($polls) $pollsMap = $polls->map('ID', 'Title', '--- Select a poll ---');
 		
@@ -37,7 +34,6 @@ class PollChoice extends DataObject {
 			new TextField('Title', '', '', 80),
 			new DropdownField('PollID', 'Belongs to', $pollsMap),
 			new ReadonlyField('Votes')
-			//new TextField('Order')
 		); 
 		
 		return $fields; 

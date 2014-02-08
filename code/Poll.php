@@ -8,35 +8,32 @@ class Poll extends DataObject implements PermissionProvider {
 	
 	const COOKIE_PREFIX = 'SSPoll_';
 	
-	static $db = Array(
-		'Title' => 'Varchar(50)',
-		'Description' => 'HTMLText',
-		'IsActive' => 'Boolean(1)',
-		'MultiChoice' => 'Boolean',
-		'Embargo' => 'SS_Datetime',
-		'Expiry' => 'SS_Datetime'
-	);
-	static $has_one = array(
-		'Image' => 'Image'
-	);
-	
-	static $has_many = Array(
-		'Choices' => 'PollChoice'
-	);
-	
-	static $searchable_fields = array(
-		'Title', 
-		'IsActive'
-	);
-	
-	static $summary_fields = array(
-		'Title',
-		'IsActive',
-		'Embargo',
-		'Expiry'
-	); 
-	
-	static $default_sort = 'Created DESC';
+	private static
+		$db = Array(
+			'Title' => 'Varchar(50)',
+			'Description' => 'HTMLText',
+			'IsActive' => 'Boolean(1)',
+			'MultiChoice' => 'Boolean',
+			'Embargo' => 'SS_Datetime',
+			'Expiry' => 'SS_Datetime'
+		),
+		$has_one = array(
+			'Image' => 'Image'
+		),
+		$has_many = Array(
+			'Choices' => 'PollChoice'
+		),
+		$searchable_fields = array(
+			'Title', 
+			'IsActive'
+		),
+		$summary_fields = array(
+			'Title',
+			'IsActive',
+			'Embargo',
+			'Expiry'
+		),
+		$default_sort = 'Created DESC';
 
 	private static $vote_handler_class = 'CookieVoteHandler';
 
