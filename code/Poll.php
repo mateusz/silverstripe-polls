@@ -107,12 +107,7 @@ class Poll extends DataObject implements PermissionProvider {
 			
 			// Display the results using the default poll chart
 			$pollForm = new PollForm(new Controller(), 'PollForm', $this);
-			$chartTab = new Tab("Result chart", new LiteralField('Chart', sprintf(
-				'<h1>%s</h1><p>%s</p>', 
-				$this->Title, 
-				$pollForm->getChart(), 
-				$this->Title))
-			);
+			$chartTab = new Tab("Results", new LiteralField('Chart', $this->renderWith('AdminResultsTab', array('form' => $pollForm))));
 			$rootTab->push($chartTab);
 		}
 		else {
