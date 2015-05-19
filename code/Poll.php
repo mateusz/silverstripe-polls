@@ -6,6 +6,9 @@
  */
 class Poll extends DataObject implements PermissionProvider {
 	
+	private static $subsites_share_polls = false;
+	private static $subsite_cms_show_in_menu = true;
+
 	const COOKIE_PREFIX = 'SSPoll_';
 	
 	static $db = Array(
@@ -14,7 +17,8 @@ class Poll extends DataObject implements PermissionProvider {
 		'IsActive' => 'Boolean(1)',
 		'MultiChoice' => 'Boolean',
 		'Embargo' => 'SS_Datetime',
-		'Expiry' => 'SS_Datetime'
+		'Expiry' => 'SS_Datetime',
+		'SubsiteID' => 'Int',
 	);
 	static $has_one = array(
 		'Image' => 'Image'
@@ -120,8 +124,16 @@ class Poll extends DataObject implements PermissionProvider {
 		}
 				
 		$this->extend('updateCMSFields', $fields);
-		
-		return $fields; 
+
+		return $fields;
+	}
+
+	function onBeforeWrite() {
+		// Limit this poll to the subsite it is defined within
+		if (class_exists('Subsite') && !$this->subsites_share_polls) {
+			$this->SubsiteID = Subsite::currentSubsiteID();
+		}
+		return parent::onBeforeWrite();
 	}
 
 	function getTotalVotes() {

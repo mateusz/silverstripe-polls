@@ -21,6 +21,7 @@ master: SilverStripe 3.0.x
 - By default, each visitor, determined by browser cookie, can only vote once
 - Uses [Google chart API](http://code.google.com/apis/chart/) 
 - Supports single and multiple-choice polls
+- Supports Subsites
 
 ## Usage
 
@@ -193,4 +194,16 @@ whether a user has voted before.
 
 See `DatabaseVoteHandler` for an example.
 
+### Subsite support
 
+By defualt the Polls menu item will show in all subsites in the CMS. If you only want it to show in the main site, add to your `config/config.yml`:
+```yml
+Poll:
+  subsite_cms_show_in_menu: false
+```
+
+By default a poll created within a subsite will only be available in that subsite. To allow polls to be shared between subsites add to your `config/config.yml`:
+```yml
+Poll:
+  subsites_share_polls: true
+```
