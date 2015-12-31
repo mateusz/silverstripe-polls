@@ -7,26 +7,29 @@
  * @author Tom Speak <@tomspeak>
  * @author Dan Hensby <@dhensby>
  */
-abstract class Vote_Backend {
+abstract class Vote_Backend
+{
 
-	protected $poll;
+    protected $poll;
 
-	public function __construct($poll) {
-		$this->setPoll($poll);
-	}
+    public function __construct($poll)
+    {
+        $this->setPoll($poll);
+    }
 
-	abstract function hasVoted();
+    abstract public function hasVoted();
 
-	abstract function canVote();
+    abstract public function canVote();
 
-	abstract function markAsVoted();
+    abstract public function markAsVoted();
 
-	public function setPoll(Poll $poll) {
-		$this->poll = $poll;
-	}
+    public function setPoll(Poll $poll)
+    {
+        $this->poll = $poll;
+    }
 
-	public function getPoll() {
-		return $this->poll;
-	}
-
+    public function getPoll()
+    {
+        return $this->poll;
+    }
 }
