@@ -5,22 +5,23 @@
  * @package polls
  */
 class Poll extends DataObject implements PermissionProvider {
-	
+
 	const COOKIE_PREFIX = 'SSPoll_';
 	
-	static $db = Array(
-		'Title' => 'Varchar(50)',
+	private static $db = Array(
+		'Title' => 'Varchar(100)',
 		'Description' => 'HTMLText',
 		'IsActive' => 'Boolean(1)',
 		'MultiChoice' => 'Boolean',
 		'Embargo' => 'SS_Datetime',
 		'Expiry' => 'SS_Datetime'
 	);
-	static $has_one = array(
+
+	private static $has_one = array(
 		'Image' => 'Image'
 	);
 	
-	static $has_many = Array(
+	private static $has_many = array(
 		'Choices' => 'PollChoice'
 	);
 	
@@ -45,10 +46,10 @@ class Poll extends DataObject implements PermissionProvider {
 	public function __construct($record = null, $isSingleton = false, $model = null) {
 		parent::__construct($record, $isSingleton, $model);
 		//create the voteHandler
-		$this->voteHandler = Injector::inst()->create(self::config()->get('vote_handler_class'), $this);
+		$this->voteHandler = Injector::inst()->create($this->config()->get('vote_handler_class'), $this);
 	}
 
-	function getCMSFields() {
+	public function getCMSFields() {
 
 		if($this->ID != 0) {
 			$totalCount = $this->getTotalVotes();
@@ -57,16 +58,16 @@ class Poll extends DataObject implements PermissionProvider {
 			$totalCount = 0;
 		}
 		
-		$fields = new FieldList(
-			$rootTab = new TabSet("Root",
-				new Tab("Main",
-					new TextField('Title', 'Poll title (maximum 50 characters)', null, 50),
-					new OptionsetField('MultiChoice', 'Single answer (radio buttons)/multi-choice answer (tick boxes)', array(0 => 'Single answer', 1 => 'Multi-choice answer')),
-					new OptionsetField('IsActive', 'Poll state', array(1 => 'Active', 0 => 'Inactive')),
-					$embargo = new DatetimeField('Embargo', 'Embargo'),
-					$expiry = new DatetimeField('Expiry', 'Expiry'),
-					new HTMLEditorField('Description', 'Description'),
-					$image = new UploadField('Image', 'Poll image')
+		$fields = FieldList::create(
+			$rootTab = TabSet::create("Root",
+				Tab::create("Main",
+					TextField::create('Title', 'Poll title (maximum 50 characters)', null, 50),
+					OptionsetField::create('MultiChoice', 'Single answer (radio buttons)/multi-choice answer (tick boxes)', array(0 => 'Single answer', 1 => 'Multi-choice answer')),
+					OptionsetField::create('IsActive', 'Poll state', array(1 => 'Active', 0 => 'Inactive')),
+					$embargo = DatetimeField::create('Embargo', 'Embargo'),
+					$expiry = DatetimeField::create('Expiry', 'Expiry'),
+					HTMLEditorField::create('Description', 'Description'),
+					$image = UploadField::create('Image', 'Poll image')
 				)
 			)
 		);
@@ -84,7 +85,6 @@ class Poll extends DataObject implements PermissionProvider {
 		// Add the fields that depend on the poll being already saved and having an ID 
 		if($this->ID != 0) {
 
-			
 			$config = GridFieldConfig::create();
 			$config->addComponent(new GridFieldToolbarHeader());
 			$config->addComponent(new GridFieldAddNewButton('toolbar-header-right'));
@@ -93,8 +93,12 @@ class Poll extends DataObject implements PermissionProvider {
 			$config->addComponent(new GridFieldDeleteAction());
 			$config->addComponent(new GridFieldDetailForm());
 			$config->addComponent(new GridFieldSortableHeader());
-			
-			$pollChoicesTable = new GridField(
+
+			if (class_exists('GridFieldOrderableRows')){
+				$config->addComponent(new GridFieldOrderableRows('Order'));
+			}
+
+			$pollChoicesTable = GridField::create(
 				'Choices',
 				'Choices',
 				$this->Choices(),
@@ -103,11 +107,11 @@ class Poll extends DataObject implements PermissionProvider {
 
 			$fields->addFieldToTab('Root.Data', $pollChoicesTable);
 
-			$fields->addFieldToTab('Root.Data', new ReadonlyField('Total', 'Total votes', $totalCount));
+			$fields->addFieldToTab('Root.Data', ReadonlyField::create('Total', 'Total votes', $totalCount));
 			
 			// Display the results using the default poll chart
-			$pollForm = new PollForm(new Controller(), 'PollForm', $this);
-			$chartTab = new Tab("Result chart", new LiteralField('Chart', sprintf(
+			$pollForm = PollForm::create(new Controller(), 'PollForm', $this);
+			$chartTab = Tab::create("Result chart", LiteralField::create('Chart', sprintf(
 				'<h1>%s</h1><p>%s</p>', 
 				$this->Title, 
 				$pollForm->getChart(), 
@@ -116,12 +120,27 @@ class Poll extends DataObject implements PermissionProvider {
 			$rootTab->push($chartTab);
 		}
 		else {
-			$fields->addFieldToTab('Root.Choices', new ReadOnlyField('ChoicesPlaceholder', 'Choices', 'You will be able to add options once you have saved the poll for the first time.'));
+			$fields->addFieldToTab('Root.Choices', ReadonlyField::create('ChoicesPlaceholder', 'Choices', 'You will be able to add options once you have saved the poll for the first time.'));
 		}
 				
 		$this->extend('updateCMSFields', $fields);
 		
-		return $fields; 
+		return $fields;
+	}
+
+	/**
+	 * Get the most recently added Poll that can be visible
+	 * 
+	 * @return Poll|null A Poll if one is visible, null otherwise
+	 */
+	public static function get_current_poll(){
+		$now = SS_Datetime::now();
+		$polls = Poll::get()
+			->filter('IsActive', "1")
+			->where('"Embargo" IS NULL OR "Embargo" < \'' . $now . "'")
+			->where('"Expiry" IS NULL OR "Expiry" > \'' . $now . "'");
+
+		return $polls->Count() ? $polls->First() : null;
 	}
 
 	function getTotalVotes() {

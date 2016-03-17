@@ -6,13 +6,13 @@
  */
 class PollChoice extends DataObject {
 	
-	static $db = Array(
+	private static $db = array(
 		'Title' => 'Varchar(255)',
 		'Votes' => 'Int',
 		'Order' => 'Int'
 	);
 	
-	static $has_one = Array(
+	private static $has_one = array(
 		'Poll' => 'Poll'
 	);
 	
@@ -21,32 +21,38 @@ class PollChoice extends DataObject {
 	);
 
 	static $summary_fields = array(
-		'Order',
 		'Title',
 		'Votes'
 	); 
 	
 	static $default_sort = '"Order" ASC, "Created" ASC';
 	
-	function getCMSFields() {
-		$polls = DataObject::get('Poll', '"IsActive" = 1'); 
+	public function getCMSFields() {
+		$polls = Poll::get()->filter('IsActive', 1); 
 		$pollsMap = array();
-		if($polls) $pollsMap = $polls->map('ID', 'Title', '--- Select a poll ---');
+		if($polls) $pollsMap = $polls->map('ID', 'Title');
 		
-		$fields = new FieldList(
-			new TextField('Title', '', '', 80),
-			new DropdownField('PollID', 'Belongs to', $pollsMap),
-			new ReadonlyField('Votes')
-			//new TextField('Order')
+		$fields = FieldList::create(
+			TextField::create('Title', '', '', 80),
+			DropdownField::create('PollID', 'Belongs to', $pollsMap)
+				->setEmptyString('Select...'),
+			ReadonlyField::create('Votes')
 		); 
 		
 		return $fields; 
 	}
 	
+	protected function onBeforeWrite() {
+		if (!$this->Order) {
+			$this->Order = PollChoice::get()->max('Order') + 1;
+		}
+		parent::onBeforeWrite();
+	}
+	
 	/** 
 	 * Increase vote by one and mark its poll has voted
 	 */ 
-	function addVote() {
+	public function addVote() {
 		$poll = $this->Poll();
 		
 		if($poll && !$poll->hasVoted()) {
@@ -73,7 +79,7 @@ class PollChoice extends DataObject {
 	 *
 	 * @param $formatPercent If true, return 55%, if not, return 0.55
 	 */
-	function getPercentageOfMax($formatPercent = true) {
+	public function getPercentageOfMax($formatPercent = true) {
 		$max = $this->Poll()->getMaxVotes();
 		if ($max==0) $max = 1;
 		$ratio = $this->Votes/$max;
@@ -85,7 +91,7 @@ class PollChoice extends DataObject {
 	 *
 	 * @param $formatPercent If true, return 55%, if not, return 0.55
 	 */
-	function getPercentageOfTotal($formatPercent = true) {
+	public function getPercentageOfTotal($formatPercent = true) {
 		$total = $this->Poll()->getTotalVotes();
 		if ($total==0) $total = 1;
 		$ratio = $this->Votes/$total;
