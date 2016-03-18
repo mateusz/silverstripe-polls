@@ -61,13 +61,20 @@ class Poll extends DataObject implements PermissionProvider {
 		$fields = FieldList::create(
 			$rootTab = TabSet::create("Root",
 				Tab::create("Main",
-					TextField::create('Title', 'Poll title (maximum 50 characters)', null, 50),
-					OptionsetField::create('MultiChoice', 'Single answer (radio buttons)/multi-choice answer (tick boxes)', array(0 => 'Single answer', 1 => 'Multi-choice answer')),
-					OptionsetField::create('IsActive', 'Poll state', array(1 => 'Active', 0 => 'Inactive')),
-					$embargo = DatetimeField::create('Embargo', 'Embargo'),
-					$expiry = DatetimeField::create('Expiry', 'Expiry'),
-					HTMLEditorField::create('Description', 'Description'),
-					$image = UploadField::create('Image', 'Poll image')
+					TextField::create('Title', _t('Poll.TITLE', 'Poll title'), null, 100)
+						->setRightTitle(_t('Poll.MAXCHARACTERS', 'Maximum 100 characters')),
+					OptionsetField::create('MultiChoice',
+						_t('Poll.ANSWERTYPE', 'Answer type'),
+						array(
+							0 => 'Single',
+							1 => 'Multi-choice'
+						)
+					)->setRightTitle(_t('Poll.ANSWERTYPEDESCRIPTION', '"Single" uses radio buttons, "Multi-choice" uses tick boxes')),
+					OptionsetField::create('IsActive', _t('Poll.STATE', 'Poll state'), array(1 => 'Active', 0 => 'Inactive')),
+					$embargo = DatetimeField::create('Embargo', _t('Poll.EMBARGO', 'Embargo')),
+					$expiry = DatetimeField::create('Expiry', _t('Poll.EXPIRY', 'Expiry')),
+					HTMLEditorField::create('Description', _t('Poll.DESCRIPTION', 'Description')),
+					$image = UploadField::create('Image', _t('Poll.IMAGE', 'Poll image'))
 				)
 			)
 		);
@@ -100,14 +107,14 @@ class Poll extends DataObject implements PermissionProvider {
 
 			$pollChoicesTable = GridField::create(
 				'Choices',
-				'Choices',
+				_t('Poll.CHOICES', 'Choices'),
 				$this->Choices(),
 				$config
 			);
 
 			$fields->addFieldToTab('Root.Data', $pollChoicesTable);
 
-			$fields->addFieldToTab('Root.Data', ReadonlyField::create('Total', 'Total votes', $totalCount));
+			$fields->addFieldToTab('Root.Data', ReadonlyField::create('Total', _t('Poll.TOTALVOTES', 'Total votes'), $totalCount));
 			
 			// Display the results using the default poll chart
 			$pollForm = PollForm::create(new Controller(), 'PollForm', $this);
