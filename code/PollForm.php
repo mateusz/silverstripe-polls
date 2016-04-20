@@ -1,12 +1,12 @@
 <?php
 class PollForm extends Form {
 	
-	static $show_results_link = false; 
+	private static $show_results_link = false; 
 	
 	/**
 	 * After submission, redirect back to the # anchor. Set to null to disable the feature.
 	 */
-	static $redirect_to_anchor = 'SSPoll';
+	private static $redirect_to_anchor = null;
 	
 	protected $poll;
 
@@ -16,7 +16,7 @@ class PollForm extends Form {
 		'colours'=>array('4D89F9', 'C6D9FD')
 	);
 
-	function __construct($controller, $name, $poll) {
+	public function __construct($controller, $name, $poll) {
 		if(!$poll) {
 			user_error("The poll doesn't exist.", E_USER_ERROR);
 		}
@@ -29,35 +29,32 @@ class PollForm extends Form {
 		}
 		
 		if($poll->MultiChoice) {
-			$choiceField = new CheckboxSetField('PollChoices', '', $data);
+			$choiceField = CheckboxSetField::create('PollChoices', '', $data);
 		}
 		else {
-			$choiceField = new OptionsetField('PollChoices', '', $data);
+			$choiceField = OptionsetField::create('PollChoices', '', $data);
 		}
 		
-		$fields =  new FieldList(
-			$choiceField
-		);
+		$fields = FieldList::create($choiceField);
 		
-		if(PollForm::$show_results_link) {
+		if($this->config()->show_results_link) {
 			$showResultsURL = Director::get_current_page()->Link() . '?poll_results'; 
-			$showResultsLink = new LiteralField('ShowPollLink', '<a class="show-results" href="' . $showResultsURL . '">Show results</a>'); 
+			$showResultsLink = LiteralField::create('ShowPollLink', '<a class="show-results" href="' . $showResultsURL . '">Show results</a>'); 
 			$fields->push($showResultsLink); 
 		}
 		
-		$actions = new FieldList(
-			new FormAction('submitPoll', 'Submit', null, null, 'button')
+		$actions = FieldList::create(
+			FormAction::create('submitPoll', 'Submit', null, null, 'button')
 		);
 
-		$validator = new PollForm_Validator('PollChoices'); 
+		$validator = PollForm_Validator::create('PollChoices'); 
 
 		parent::__construct($controller, $name, $fields, $actions, $validator);
 	}
 	
-	function submitPoll($data, $form) {
+	public function submitPoll($data, $form) {
 		$choiceIDs = is_array($data['PollChoices']) ? $data['PollChoices'] : array($data['PollChoices']);
-		$choicesIDs = implode(',', $choiceIDs);
-		$choices = DataObject::get('PollChoice', sprintf('"ID" IN (%s)', $choicesIDs)); 
+		$choices = PollChoice::get()->filter('ID', $choiceIDs); 
 
 		if($choices) {
 			foreach($choices as $choice) {
@@ -67,7 +64,7 @@ class PollForm extends Form {
 		}
 		
 		// Redirect back to anchor (partly copied from Director::redirectBack)
-		if (self::$redirect_to_anchor) {
+		if ($this->config()->redirect_to_anchor) {
 			if($this->request->requestVar('_REDIRECT_BACK_URL')) {
 				$url = $this->request->requestVar('_REDIRECT_BACK_URL');
 			} else if($this->request->getHeader('Referer')) {
@@ -75,7 +72,7 @@ class PollForm extends Form {
 			} else {
 				$url = Director::baseURL();
 			}
-			$url .= '#'.self::$redirect_to_anchor.'-'.$this->poll->ID;
+			$url .= '#'.$this->config()->redirect_to_anchor.'-'.$this->poll->ID;
 
 			$this->controller->redirect($url);
 		}
@@ -87,7 +84,7 @@ class PollForm extends Form {
 	/**
 	 * Renders the poll using the PollForm.ss
 	 */
-	function forTemplate() {
+	public function forTemplate() {
 		if (!$this->poll || !$this->poll->getVisible() || !$this->poll->Choices()) return null;
 
 		$this->DefaultForm = $this->renderWith('Form');
@@ -100,43 +97,43 @@ class PollForm extends Form {
 	/**
 	 * Set the default chart options
 	 */
-	function setChartOption($option, $value) {
+	public function setChartOption($option, $value) {
 		$this->chartOptions[$option] = $value;
 	}
 	
 	/**
 	 * Access the default chart options
 	 */
-	function getChartOption($option) {
+	public function getChartOption($option) {
 		if (isset($this->chartOptions[$option])) return $this->chartOptions[$option];
 	}
 
 	/**
 	 * Access the Poll object associated with this form
 	 */
-	function Poll() {
+	public function Poll() {
 		return $this->poll;
 	}
 	
 	/**
 	 * Check if user bypassed the voting form and requested to see the results.
 	 */
-	function isForcedDisplay() {
+	public function isForcedDisplay() {
 		return isset($_REQUEST['poll_results']); 
 	}
 	
 	/**
 	 * Collate the information from PollForm and Poll to figure out if the results should be shown.
 	 */
-	function getShouldShowResults() {
+	public function getShouldShowResults() {
 		return !$this->poll->canVote() || $this->isForcedDisplay(); 
 	}
 
 	/**
 	 * Get current configuration so it can be used in the template
 	 */
-	function getShowResultsLink() {
-		return $this->show_results_link;
+	public function getShowResultsLink() {
+		return $this->config()->show_results_link;
 	}
 
 	/**
@@ -149,7 +146,7 @@ class PollForm extends Form {
 	 *
 	 * @return string
 	 */ 
-	function getChart() {
+	public function getChart() {
 		$extended = $this->extend('replaceChart');
 		if (isset($extended) && count($extended)) return array_shift($extended);
 
