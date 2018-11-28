@@ -1,4 +1,6 @@
 <?php
+namespace Mateusz\Polls\Tests;
+
 class PollFormTest extends FunctionalTest {
 	static $fixture_file = 'polls/tests/Base.yml';
 	static $use_draft_site = true;

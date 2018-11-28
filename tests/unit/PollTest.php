@@ -1,4 +1,6 @@
 <?php
+namespace Mateusz\Polls\Tests;
+
 class PollTest extends SapphireTest {
 
 	static $fixture_file = 'polls/tests/Base.yml';

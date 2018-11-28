@@ -1,7 +1,7 @@
 {
 	"name": "mateusz/silverstripe-polls",
 	"description": "Poll module for SilverStripe",
-	"type": "silverstripe-module",
+	"type": "silverstripe-vendormodule",
 	"keywords": ["silverstripe", "polls", "forms"],
 	"license": "BSD-3-Clause",
 	"authors": [
@@ -11,10 +11,19 @@
 		}
 	],
 	"require": {
-		"silverstripe/framework": "~3.1.2",
-		"silverstripe/cms": "~3.1.2"
-	},
-	"extra": {
-		"installer-name": "polls"
-	}
+		"silverstripe/framework": "^4.0",
+        "silverstripe/cms": "^4.0",
+        "silverstripe/admin": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Mateusz\\Polls\\": "src/",
+            "Mateusz\\Polls\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "installer-name": "polls"
+    },
+    "prefer-stable": true,
+    "minimum-stability": "dev"
 }
