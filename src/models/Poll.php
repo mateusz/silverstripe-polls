@@ -217,8 +217,8 @@ class Poll extends DataObject implements PermissionProvider
             return false;
         }
 
-        if ($this->Embargo && DBDatetime::now()->Format('U')<$this->obj('Embargo')->Format('U') ||
-            $this->Expiry && DBDatetime::now()->Format('U')>$this->obj('Expiry')->Format('U')) {
+        if (($this->Embargo && $this->obj('Embargo')->InFuture()) ||
+            ($this->Expiry && $this->obj('Expiry')->InPast())) {
             return false;
         }
 

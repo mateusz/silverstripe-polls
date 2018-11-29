@@ -79,7 +79,11 @@ Here's a suggestion how to create and expose a PollForm to all your templates:
 
 ```php
 class Page_Controller extends ContentController {
-	...
+    ...
+
+    private static $allowed_actions = [ 'PollForm' ];
+
+    ...
 
 	function PollForm() {
 		$pollForm = new PollForm($this, 'PollForm', $this->Poll());	

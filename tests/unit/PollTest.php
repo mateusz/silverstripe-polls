@@ -1,64 +1,74 @@
 <?php
 namespace Mateusz\Polls\Tests;
 
-class PollTest extends SapphireTest {
+use Mateusz\Polls\Models\Poll;
+use Mateusz\Polls\Forms\PollForm;
+use SilverStripe\Dev\SapphireTest;
+use SilverStripe\Control\Controller;
+use SilverStripe\ORM\FieldType\DBDatetime;
 
-	static $fixture_file = 'polls/tests/Base.yml';
+class PollTest extends SapphireTest
+{
 
-	function testTotalVotes() {
-		$mobilePoll = $this->ObjFromFixture('Poll', 'mobile-poll');
-		$this->assertEquals(120 + 80 + 12, $mobilePoll->getTotalVotes());
+    static $fixture_file = '../Base.yml';
 
-		$colorPoll = $this->ObjFromFixture('Poll', 'color-poll');
-		$this->assertEquals(6 + 15 + 30, $colorPoll->getTotalVotes());
-	}
+    public function testTotalVotes()
+    {
+        $mobilePoll = $this->ObjFromFixture(Poll::class, 'mobile-poll');
+        $this->assertEquals(120 + 80 + 12, $mobilePoll->getTotalVotes());
 
-	function testChartURL() {
-		$mobilePoll = $this->ObjFromFixture('Poll', 'mobile-poll');
-		$pollForm = new PollForm(new Controller(), 'PollForm', $mobilePoll);
-		$chart = $pollForm->getChart();
-		$this->assertContains('iPhone (120)', $chart);
-		$this->assertContains('Android (80)', $chart);
-		$this->assertContains('Other (12)', $chart);
-	}
+        $colorPoll = $this->ObjFromFixture(Poll::class, 'color-poll');
+        $this->assertEquals(6 + 15 + 30, $colorPoll->getTotalVotes());
+    }
 
-	function testMaxVotes() {
-		$mobilePoll = $this->ObjFromFixture('Poll', 'mobile-poll');
-		$this->assertEquals(120, $mobilePoll->getMaxVotes());
+    public function testChartURL()
+    {
+        $mobilePoll = $this->ObjFromFixture(Poll::class, 'mobile-poll');
+        $pollForm = new PollForm(new Controller(), 'PollForm', $mobilePoll);
+        $chart = $pollForm->getChart();
+        $this->assertContains('iPhone (120)', $chart);
+        $this->assertContains('Android (80)', $chart);
+        $this->assertContains('Other (12)', $chart);
+    }
 
-		$colorPoll = $this->ObjFromFixture('Poll', 'color-poll');
-		$this->assertEquals(30, $colorPoll->getMaxVotes());
-	}
+    public function testMaxVotes()
+    {
+        $mobilePoll = $this->ObjFromFixture(Poll::class, 'mobile-poll');
+        $this->assertEquals(120, $mobilePoll->getMaxVotes());
 
-	function testVisible() {
-		$mobilePoll = $this->ObjFromFixture('Poll', 'mobile-poll');
-		$this->assertTrue($mobilePoll->getVisible());
+        $colorPoll = $this->ObjFromFixture(Poll::class, 'color-poll');
+        $this->assertEquals(30, $colorPoll->getMaxVotes());
+    }
 
-		$mobilePoll->IsActive = false;
-		$mobilePoll->write();
-		$this->assertFalse($mobilePoll->getVisible());
+    public function testVisible()
+    {
+        $mobilePoll = $this->ObjFromFixture(Poll::class, 'mobile-poll');
+        $this->assertTrue($mobilePoll->getVisible());
 
-		$mobilePoll->IsActive = true;
-		$mobilePoll->Embargo = "2010-10-10 10:10:10";
-		$mobilePoll->Expiry = "2010-10-11 10:10:10";
-		$mobilePoll->write();
+        $mobilePoll->IsActive = false;
+        $mobilePoll->write();
+        $this->assertFalse($mobilePoll->getVisible());
 
-		SS_Datetime::set_mock_now('2010-10-10 10:00:00');
-		$this->assertFalse($mobilePoll->getVisible());
+        $mobilePoll->IsActive = true;
+        $mobilePoll->Embargo = "2010-10-10 10:10:10";
+        $mobilePoll->Expiry = "2010-10-11 10:10:10";
+        $mobilePoll->write();
 
-		SS_Datetime::set_mock_now('2010-10-10 11:00:00');
-		$this->assertTrue($mobilePoll->getVisible());
+        DBDatetime::set_mock_now('2010-10-10 10:00:00');
+        $this->assertFalse($mobilePoll->getVisible());
 
-		SS_Datetime::set_mock_now('2010-10-12 10:00:00');
-		$this->assertFalse($mobilePoll->getVisible());
-	}
+        DBDatetime::set_mock_now('2010-10-10 11:00:00');
+        $this->assertTrue($mobilePoll->getVisible());
 
-	function testMarkAsVoted() {
-		// This cannot be tested this way as it relies on cookies.
-		/*
-		$mobilePoll = $this->ObjFromFixture('Poll', 'mobile-poll');
-		$mobilePoll->markAsVoted();
-		$this->assertTrue($mobilePoll->hasVoted());
-		*/
-	}
+        DBDatetime::set_mock_now('2010-10-12 10:00:00');
+        $this->assertFalse($mobilePoll->getVisible());
+    }
+
+    public function testMarkAsVoted()
+    {
+        // This cannot be tested this way as it relies on cookies.
+        $mobilePoll = $this->ObjFromFixture(Poll::class, 'mobile-poll');
+        $mobilePoll->markAsVoted();
+        $this->assertTrue($mobilePoll->hasVoted());
+    }
 }
