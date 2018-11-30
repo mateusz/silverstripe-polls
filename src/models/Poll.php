@@ -42,6 +42,11 @@ class Poll extends DataObject implements PermissionProvider
     const COOKIE_PREFIX = 'SSPoll_';
 
     /**
+     * @var string
+     */
+    private static $table_name = "Poll";
+
+    /**
      * @var array
      */
     private static $db = [

@@ -16,6 +16,10 @@ use SilverStripe\Security\Permission;
  */
 class PollChoice extends DataObject
 {
+    /**
+     * @var string
+     */
+    private static $table_name = "PollChoice";
 
     /**
      * @var array
