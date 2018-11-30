@@ -1,34 +1,34 @@
-Poll:
-	mobile-poll:
-		Title: Which mobile oprating system do you prefer? 
-		MultiChoice: 0
-	color-poll:
-		Title: What is your favourite color?
-		MultiChoice: 1
+Mateusz\Polls\Models\Poll:
+  mobile-poll:
+    Title: Which mobile oprating system do you prefer?
+    MultiChoice: 0
+  color-poll:
+    Title: What is your favourite color?
+    MultiChoice: 1
 
-PollChoice:
-	iphone:
-		Title: iPhone
-		Votes: 120
-		Poll: =>Poll.mobile-poll
-	android:
-		Title: Android
-		Votes: 80
-		Poll: =>Poll.mobile-poll
-	other-mobile:
-		Title: Other
-		Votes: 12
-		Poll: =>Poll.mobile-poll
-	red: 
-		Title: Red
-		Votes: 6
-		Poll: =>Poll.color-poll
-	green: 
-		Title: Green
-		Votes: 15
-		Poll: =>Poll.color-poll
-	blue:
-		Title: Blue
-		Votes: 30
-		Poll: =>Poll.color-poll
-	
+Mateusz\Polls\Models\PollChoice:
+  iphone:
+    Title: iPhone
+    Votes: 120
+    Poll: =>Mateusz\Polls\Models\Poll.mobile-poll
+  android:
+    Title: Android
+    Votes: 80
+    Poll: =>Mateusz\Polls\Models\Poll.mobile-poll
+  other-mobile:
+    Title: Other
+    Votes: 12
+    Poll: =>Mateusz\Polls\Models\Poll.mobile-poll
+  red:
+    Title: Red
+    Votes: 6
+    Poll: =>Mateusz\Polls\Models\Poll.color-poll
+  green:
+    Title: Green
+    Votes: 15
+    Poll: =>Mateusz\Polls\Models\Poll.color-poll
+  blue:
+    Title: Blue
+    Votes: 30
+    Poll: =>Mateusz\Polls\Models\Poll.color-poll
+
